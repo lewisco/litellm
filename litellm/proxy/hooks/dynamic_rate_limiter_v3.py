@@ -2,7 +2,6 @@
 Dynamic rate limiter v3 - Saturation-aware priority-based rate limiting
 """
 
-import os
 from collections.abc import Callable
 from datetime import datetime
 from typing import TYPE_CHECKING, Final, Literal
@@ -42,6 +41,12 @@ from litellm.types.utils import CallTypesLiteral
 
 if TYPE_CHECKING:
     from litellm.types.utils import PriorityReservationSettings
+
+
+def _proxy_has_valid_license() -> bool:
+    from litellm.proxy.proxy_server import premium_user
+
+    return premium_user is True
 
 
 def _get_priority_settings() -> "PriorityReservationSettings":
@@ -88,9 +93,11 @@ class _PROXY_DynamicRateLimitHandlerV3(CustomLogger):
         self,
         internal_usage_cache: DualCache,
         time_provider: Callable[[], datetime] | None = None,
-    ):
+        premium_user_provider: Callable[[], bool] = _proxy_has_valid_license,
+    ) -> None:
         self.internal_usage_cache = InternalUsageCache(dual_cache=internal_usage_cache)
         self.v3_limiter = _PROXY_MaxParallelRequestsHandler_v3(self.internal_usage_cache, time_provider=time_provider)
+        self.premium_user_provider = premium_user_provider
 
     def update_variables(self, llm_router: Router):
         self.llm_router = llm_router
@@ -126,18 +133,18 @@ class _PROXY_DynamicRateLimitHandlerV3(CustomLogger):
 
     def _get_priority_weight(self, priority: str | None, model_info: ModelGroupInfo | None = None) -> float:
         """Get the weight for a given priority from litellm.priority_reservation"""
-        weight: float = _get_priority_settings().default_priority
-        if litellm.priority_reservation is None or priority not in litellm.priority_reservation:
+        default_priority: Final = _get_priority_settings().default_priority
+        priority_reservation: Final = litellm.priority_reservation
+        if priority is None or priority_reservation is None or priority not in priority_reservation:
             verbose_proxy_logger.debug("Priority Reservation not set for the given priority.")
-        elif priority is not None and litellm.priority_reservation is not None:
-            if os.getenv("LITELLM_LICENSE", None) is None:
-                verbose_proxy_logger.error(
-                    "PREMIUM FEATURE: Reserving tpm/rpm by priority is a premium feature. Please add a 'LITELLM_LICENSE' to your .env to enable this.\nGet a license: https://docs.litellm.ai/docs/proxy/enterprise."
-                )
-            else:
-                value: Final = litellm.priority_reservation[priority]
-                weight = convert_priority_to_percent(value, model_info)
-        return weight
+            return default_priority
+        if not self.premium_user_provider():
+            verbose_proxy_logger.error(
+                "PREMIUM FEATURE: Reserving tpm/rpm by priority requires a valid LiteLLM Enterprise license."
+            )
+            return default_priority
+        value: Final = priority_reservation[priority]
+        return convert_priority_to_percent(value, model_info)
 
     def _get_priority_from_user_api_key_dict(self, user_api_key_dict: UserAPIKeyAuth) -> str | None:
         """

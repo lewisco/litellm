@@ -3,7 +3,6 @@
 ## Tracks num active projects per minute
 
 import asyncio
-import os
 from collections.abc import Callable
 from datetime import datetime
 from typing import Final
@@ -24,6 +23,12 @@ from litellm.proxy.hooks.rate_limiter_utils import (
 from litellm.types.router import ModelGroupInfo
 from litellm.types.utils import CallTypesLiteral
 from litellm.utils import get_utc_datetime
+
+
+def _proxy_has_valid_license() -> bool:
+    from litellm.proxy.proxy_server import premium_user
+
+    return premium_user is True
 
 
 class DynamicRateLimiterCache:
@@ -79,8 +84,31 @@ class DynamicRateLimiterCache:
 
 class _PROXY_DynamicRateLimitHandler(CustomLogger):
     # Class variables or attributes
-    def __init__(self, internal_usage_cache: DualCache, time_fn: Callable[[], datetime] = get_utc_datetime):
+    def __init__(
+        self,
+        internal_usage_cache: DualCache,
+        time_fn: Callable[[], datetime] = get_utc_datetime,
+        premium_user_provider: Callable[[], bool] = _proxy_has_valid_license,
+    ) -> None:
         self.internal_usage_cache = DynamicRateLimiterCache(cache=internal_usage_cache, time_fn=time_fn)
+        self.premium_user_provider = premium_user_provider
+
+    def _get_priority_weight(self, priority: str | None, model_group_info: ModelGroupInfo | None) -> float:
+        priority_reservation: Final = litellm.priority_reservation
+        if priority is None or priority_reservation is None or priority not in priority_reservation:
+            verbose_proxy_logger.error(
+                "Priority Reservation not set. priority=%s, but litellm.priority_reservation is %s.",
+                priority,
+                priority_reservation,
+            )
+            return 1
+        if not self.premium_user_provider():
+            verbose_proxy_logger.error(
+                "PREMIUM FEATURE: Reserving tpm/rpm by priority requires a valid LiteLLM Enterprise license."
+            )
+            return 1
+        value: Final = priority_reservation[priority]
+        return convert_priority_to_percent(value, model_group_info)
 
     def update_variables(self, llm_router: Router):
         self.llm_router = llm_router
@@ -108,21 +136,7 @@ class _PROXY_DynamicRateLimitHandler(CustomLogger):
             # Get model info first for conversion
             model_group_info: Final[ModelGroupInfo | None] = self.llm_router.get_model_group_info(model_group=model)
 
-            weight: float = 1
-            if litellm.priority_reservation is None or priority not in litellm.priority_reservation:
-                verbose_proxy_logger.error(
-                    "Priority Reservation not set. priority=%s, but litellm.priority_reservation is %s.",
-                    priority,
-                    litellm.priority_reservation,
-                )
-            elif priority is not None and litellm.priority_reservation is not None:
-                if os.getenv("LITELLM_LICENSE", None) is None:
-                    verbose_proxy_logger.error(
-                        "PREMIUM FEATURE: Reserving tpm/rpm by priority is a premium feature. Please add a 'LITELLM_LICENSE' to your .env to enable this.\nGet a license: https://docs.litellm.ai/docs/proxy/enterprise."
-                    )
-                else:
-                    value: Final = litellm.priority_reservation[priority]
-                    weight = convert_priority_to_percent(value, model_group_info)
+            weight: Final = self._get_priority_weight(priority, model_group_info)
 
             active_projects: Final = await self.internal_usage_cache.async_get_cache(model=model)
             (

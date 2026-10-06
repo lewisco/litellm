@@ -1497,7 +1497,7 @@ async def new_team(
 
         # Check if license is over limit
         total_teams: Final = await _team_db(prisma_client).count()
-        if total_teams and _license_check.is_team_count_over_limit(team_count=total_teams):
+        if _license_check.would_exceed_team_limit(current_teams=total_teams):
             raise HTTPException(
                 status_code=403,
                 detail="License is over limit. Please contact support@berri.ai to upgrade your license.",

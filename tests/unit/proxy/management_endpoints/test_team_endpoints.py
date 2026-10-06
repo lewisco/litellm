@@ -5861,7 +5861,7 @@ async def test_new_team_max_budget_exceeds_user_max_budget():
     ):
         # Setup basic mocks
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
         mock_prisma.get_data = AsyncMock(return_value=None)
 
         # Mock user cache to return a user object with max_budget=100.0
@@ -5930,7 +5930,7 @@ async def test_new_team_max_budget_within_user_limit():
     ):
         # Setup mocks
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
         mock_prisma.jsonify_team_object = lambda db_data: db_data
         mock_prisma.get_data = AsyncMock(return_value=None)
         mock_prisma.update_data = AsyncMock()
@@ -6065,7 +6065,7 @@ async def test_new_team_org_scoped_budget_bypasses_user_limit():
     ):
         # Setup mocks
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
         mock_prisma.jsonify_team_object = lambda db_data: db_data
         mock_prisma.get_data = AsyncMock(return_value=None)
         mock_prisma.update_data = AsyncMock()
@@ -6211,7 +6211,7 @@ async def test_new_team_org_scoped_models_bypasses_user_limit():
     ):
         # Setup mocks
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
         mock_prisma.jsonify_team_object = lambda db_data: db_data
         mock_prisma.get_data = AsyncMock(return_value=None)
         mock_prisma.update_data = AsyncMock()
@@ -6352,7 +6352,7 @@ async def test_new_team_standalone_validates_against_user_models(monkeypatch):
     ):
         # Setup basic mocks
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
         mock_prisma.get_data = AsyncMock(return_value=None)
 
         # Should raise ProxyException because gpt-4 is not in user's allowed models
@@ -6421,7 +6421,7 @@ async def test_new_team_standalone_validates_against_user_budget():
     ):
         # Setup basic mocks
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
         mock_prisma.get_data = AsyncMock(return_value=None)
 
         # Mock user cache to return user with restrictive personal budget ($3)
@@ -6497,7 +6497,7 @@ async def test_new_team_org_scoped_budget_exceeds_org_limit():
     ):
         # Setup mocks
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
         mock_prisma.get_data = AsyncMock(return_value=None)
 
         # Mock organization with $100 budget limit
@@ -6576,7 +6576,7 @@ async def test_new_team_org_scoped_models_not_in_org_models():
     ):
         # Setup mocks
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
         mock_prisma.get_data = AsyncMock(return_value=None)
 
         # Mock organization with specific allowed models (not including claude-3-opus)
@@ -7950,7 +7950,7 @@ async def test_new_team_org_scoped_tpm_exceeds_org_limit():
             new=AsyncMock(return_value=mock_org),
         ),
     ):
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
         mock_prisma.get_data = AsyncMock(return_value=None)
 
@@ -8025,7 +8025,7 @@ async def test_new_team_org_scoped_rpm_exceeds_org_limit():
             new=AsyncMock(return_value=mock_org),
         ),
     ):
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
         mock_prisma.get_data = AsyncMock(return_value=None)
 
@@ -8110,7 +8110,7 @@ async def test_new_team_org_scoped_tpm_rpm_bypasses_user_limit():
             new=AsyncMock(),
         ),
     ):
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
         mock_prisma.get_data = AsyncMock(return_value=None)
 
@@ -9776,7 +9776,7 @@ async def test_new_team_soft_budget_validation(
     ):
         # Setup mocks
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
         mock_prisma.jsonify_team_object = lambda db_data: db_data
         mock_prisma.get_data = AsyncMock(return_value=None)
         mock_prisma.update_data = AsyncMock()
@@ -12282,7 +12282,7 @@ async def test_new_team_rejects_reserved_ui_session_team_id():
         patch("litellm.proxy.proxy_server._license_check") as mock_license,
     ):
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
         mock_prisma.get_data = AsyncMock(return_value=None)
 
         with pytest.raises(ProxyException) as exc_info:
@@ -12851,7 +12851,7 @@ async def test_new_team_validator_runs_without_metadata_and_rejection_blocks_cre
         mock_prisma.db.litellm_teamtable.count = AsyncMock(return_value=0)
         mock_prisma.db.litellm_teamtable.create = AsyncMock()
         _wire_team_create_tx(mock_prisma)
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
 
         with pytest.raises(ProxyException) as exc_info:
             await new_team(
@@ -12927,7 +12927,7 @@ async def test_new_team_rejection_precedes_model_alias_write():
         mock_prisma.db.litellm_teamtable.create = AsyncMock()
         _wire_team_create_tx(mock_prisma)
         mock_prisma.db.litellm_modeltable.create = AsyncMock(return_value=MagicMock(id="model-1"))
-        mock_license.is_team_count_over_limit.return_value = False
+        mock_license.would_exceed_team_limit.return_value = False
 
         with pytest.raises(ProxyException):
             await new_team(
@@ -13732,7 +13732,7 @@ async def test_new_team_created_audit_event_carries_the_final_roster(monkeypatch
     _wire_team_create_tx(mock_prisma)
 
     mock_license = MagicMock()
-    mock_license.is_team_count_over_limit.return_value = False
+    mock_license.would_exceed_team_limit.return_value = False
     monkeypatch.setattr("litellm.proxy.proxy_server.prisma_client", mock_prisma)
     monkeypatch.setattr("litellm.proxy.proxy_server._license_check", mock_license)
     monkeypatch.setattr("litellm.proxy.proxy_server.litellm_proxy_admin_name", "admin")

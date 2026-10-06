@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 import pytest
 
+import litellm
 from litellm.caching.caching import DualCache
 from litellm.proxy.hooks.dynamic_rate_limiter import (
     DynamicRateLimiterCache,
@@ -42,3 +43,14 @@ async def test_handler_threads_time_fn_to_internal_cache():
     )
     await handler.internal_usage_cache.async_set_cache_sadd(model="my-fake-model", value=["p1", "p2"])
     assert await handler.internal_usage_cache.async_get_cache(model="my-fake-model") == 2
+
+
+def test_unverified_license_environment_does_not_enable_priority_reservations(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("LITELLM_LICENSE", "unverified-license")
+    monkeypatch.setattr(litellm, "priority_reservation", {"high": 0.9})
+    handler = _PROXY_DynamicRateLimitHandler(
+        internal_usage_cache=DualCache(),
+        premium_user_provider=lambda: False,
+    )
+
+    assert handler._get_priority_weight("high", None) == 1

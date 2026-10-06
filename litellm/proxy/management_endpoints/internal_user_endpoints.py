@@ -568,7 +568,7 @@ async def new_user(
 
         # Check if license is over limit
         billable_users: Final = await UserRepository(prisma_client).count_billable_users()
-        if billable_users and _license_check.is_over_limit(total_users=billable_users):
+        if _license_check.would_exceed_user_limit(current_users=billable_users):
             raise HTTPException(
                 status_code=403,
                 detail="License is over limit. Please contact support@berri.ai to upgrade your license.",

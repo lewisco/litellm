@@ -32,6 +32,18 @@ class TimeController:
         self._current += timedelta(seconds=seconds)
 
 
+def test_unverified_license_environment_does_not_enable_priority_reservations(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("LITELLM_LICENSE", "unverified-license")
+    monkeypatch.setattr(litellm, "priority_reservation", {"high": 0.9})
+    default_priority = litellm.priority_reservation_settings.default_priority
+    handler = DynamicRateLimitHandler(
+        internal_usage_cache=DualCache(),
+        premium_user_provider=lambda: False,
+    )
+
+    assert handler._get_priority_weight("high") == default_priority
+
+
 @pytest.fixture
 def time_controller(monkeypatch):
     controller = TimeController()
