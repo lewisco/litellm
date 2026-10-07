@@ -51,6 +51,11 @@ class A2AProviderConfigManager:
 
             return LangFlowA2AConfig()
 
+        if custom_llm_provider == "n8n":
+            from litellm.a2a_protocol.providers.n8n.config import N8nA2AConfig
+
+            return N8nA2AConfig()
+
         if custom_llm_provider == "watsonx_orchestrate":
             from litellm.a2a_protocol.providers.watsonx_orchestrate.config import (
                 WatsonxOrchestrateA2AConfig,

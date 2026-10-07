@@ -71,6 +71,7 @@ The proxy then normalizes the client-facing response to the agent's pinned `prot
 
 ## Classes
 
+For n8n Chat Trigger endpoints, use the dedicated provider adapter described in the [n8n agent cookbook](../../../cookbook/n8n_agents/README.md)
+
 - `A2ACompletionBridgeTransformation` - Static methods for message format conversion
 - `A2ACompletionBridgeHandler` - Static methods for handling requests (streaming/non-streaming)
-
