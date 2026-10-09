@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { EndUser } from "@/app/(dashboard)/hooks/customers/useCustomers";
-import type { MCPServer } from "@/components/mcp_tools/types";
+import type { MCPServer, MCPToolset } from "@/components/mcp_tools/types";
 import { buildCustomerPayload, toCustomerFormValues } from "./customerPayload";
 
 const customer: EndUser = { user_id: "customer-id", blocked: false, spend: 0 };
@@ -184,6 +184,85 @@ describe("customer payload", () => {
     };
 
     expect(buildCustomerPayload(values, stored, [server], [])).toEqual({
+      user_id: customer.user_id,
+      models: [],
+      object_permission: grant,
+    });
+  });
+
+  it.each([
+    { kind: "server", allowedTools: ["read"] },
+    { kind: "toolset", allowedTools: ["write"] },
+  ])("keeps an independent tool grant when adding a $kind", ({ kind, allowedTools }) => {
+    const stored = {
+      ...customer,
+      object_permission: {
+        ...permission,
+        mcp_servers: [],
+        mcp_access_groups: [],
+        mcp_toolsets: [],
+        mcp_tool_permissions: { "server-id": ["read"] },
+      },
+    };
+    const anotherServer = { ...server, server_id: "another-server" };
+    const toolsets: MCPToolset[] = [
+      {
+        toolset_id: "toolset-id",
+        toolset_name: "Toolset",
+        tools: [{ server_id: anotherServer.server_id, tool_name: "list" }],
+      },
+    ];
+    const selection = {
+      servers: kind === "server" ? [anotherServer.server_id] : [],
+      accessGroups: [],
+      toolsets: kind === "toolset" ? [toolsets[0].toolset_id] : [],
+    };
+    const values = {
+      ...toCustomerFormValues(stored),
+      mcp_servers_and_groups: selection,
+      mcp_tool_permissions: { "server-id": allowedTools },
+    };
+    const grant = {
+      mcp_servers: selection.servers,
+      mcp_access_groups: [],
+      mcp_toolsets: selection.toolsets,
+      mcp_tool_permissions: values.mcp_tool_permissions,
+    };
+
+    expect(buildCustomerPayload(values, stored, [server, anotherServer], toolsets)).toEqual({
+      user_id: customer.user_id,
+      models: [],
+      object_permission: grant,
+    });
+  });
+
+  it("keeps a canonical server edit from an independent shared-alias grant when adding a server", () => {
+    const stored = {
+      ...customer,
+      object_permission: {
+        ...permission,
+        mcp_servers: [],
+        mcp_access_groups: [],
+        mcp_toolsets: [],
+        mcp_tool_permissions: { wiki: ["read"] },
+      },
+    };
+    const sharedServer = { ...server, alias: "wiki" };
+    const anotherSharedServer = { ...sharedServer, server_id: "another-shared-server" };
+    const addedServer = { ...server, server_id: "added-server" };
+    const values = {
+      ...toCustomerFormValues(stored),
+      mcp_servers_and_groups: { servers: [addedServer.server_id], accessGroups: [], toolsets: [] },
+      mcp_tool_permissions: { wiki: ["read"], [sharedServer.server_id]: ["write"] },
+    };
+    const grant = {
+      mcp_servers: values.mcp_servers_and_groups.servers,
+      mcp_access_groups: [],
+      mcp_toolsets: [],
+      mcp_tool_permissions: values.mcp_tool_permissions,
+    };
+
+    expect(buildCustomerPayload(values, stored, [sharedServer, anotherSharedServer, addedServer], [])).toEqual({
       user_id: customer.user_id,
       models: [],
       object_permission: grant,

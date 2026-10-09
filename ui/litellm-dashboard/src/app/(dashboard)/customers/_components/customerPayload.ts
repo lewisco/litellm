@@ -1,6 +1,7 @@
 import type { EndUser } from "@/app/(dashboard)/hooks/customers/useCustomers";
 import type { UpdateCustomerRequest } from "@/app/(dashboard)/hooks/customers/customerApi";
 import type { MCPServer, MCPToolset } from "@/components/mcp_tools/types";
+import { mcpServersForIdentifier } from "@/components/mcp_server_management/effectiveMcpServers";
 import { extractMcpEntitlement, type McpEntitlementUpdate } from "@/components/mcp_server_management/mcpEntitlement";
 
 export type CustomerFormValues = {
@@ -61,6 +62,41 @@ const grantIdentity = (grant: McpEntitlementUpdate): string => {
 const selectionIdentity = (grant: McpEntitlementUpdate): string =>
   grantIdentity({ ...grant, mcp_tool_permissions: {} });
 
+const extractEditedMcpGrant = (
+  values: CustomerFormValues,
+  storedGrant: McpEntitlementUpdate,
+  servers: MCPServer[],
+  toolsets: MCPToolset[],
+): McpEntitlementUpdate | null => {
+  const grant = extractMcpEntitlement(values, servers, toolsets);
+  if (!grant) return null;
+  const previousValues = {
+    mcp_servers_and_groups: {
+      servers: storedGrant.mcp_servers,
+      accessGroups: storedGrant.mcp_access_groups,
+      toolsets: storedGrant.mcp_toolsets,
+    },
+    mcp_tool_permissions: storedGrant.mcp_tool_permissions,
+  };
+  const previousPermissions = extractMcpEntitlement(previousValues, servers, toolsets)?.mcp_tool_permissions ?? {};
+  const independentKeys = new Set(
+    Object.keys(storedGrant.mcp_tool_permissions).filter((key) => !Object.hasOwn(previousPermissions, key)),
+  );
+  const independentServerIds = new Set(
+    Array.from(independentKeys).flatMap((key) =>
+      mcpServersForIdentifier(servers, key).map((server) => server.server_id),
+    ),
+  );
+  const independentPermissions = Object.fromEntries(
+    Object.entries(values.mcp_tool_permissions).filter(
+      ([key]) =>
+        independentKeys.has(key) ||
+        mcpServersForIdentifier(servers, key).some((server) => independentServerIds.has(server.server_id)),
+    ),
+  );
+  return { ...grant, mcp_tool_permissions: { ...grant.mcp_tool_permissions, ...independentPermissions } };
+};
+
 const changedMcpGrant = (
   values: CustomerFormValues,
   existing: EndUser | null,
@@ -80,7 +116,7 @@ const changedMcpGrant = (
   const grant =
     selectionIdentity(formGrant) === selectionIdentity(storedGrant)
       ? formGrant
-      : extractMcpEntitlement(values, servers, toolsets);
+      : extractEditedMcpGrant(values, storedGrant, servers, toolsets);
   return grant && grantIdentity(grant) !== storedIdentity ? grant : null;
 };
 
