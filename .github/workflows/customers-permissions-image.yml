@@ -1,0 +1,54 @@
+name: Customers image
+
+on:
+  push:
+    branches:
+      - litellm_customers_combined
+    paths:
+      - .github/workflows/customers-permissions-image.yml
+      - .gitea/scripts/*customers-permissions-image.sh
+  workflow_dispatch:
+
+concurrency:
+  group: customers-permissions-image-github
+  cancel-in-progress: false
+
+jobs:
+  build-smoke-publish:
+    if: github.server_url == 'https://github.com'
+    permissions:
+      contents: read
+      packages: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Check out exact workflow and application commits
+        shell: bash
+        env:
+          WORKFLOW_SHA: ${{ github.sha }}
+          SOURCE_COMMIT: 8daedbc4ed501f52b8ec1569684e3b82fb60b92f
+        run: |
+          set -euo pipefail
+          git init workflow
+          git -C workflow remote add origin https://github.com/lewisco/litellm.git
+          git -C workflow fetch --depth=1 origin "$WORKFLOW_SHA"
+          git -C workflow checkout --detach FETCH_HEAD
+          test "$(git -C workflow rev-parse HEAD)" = "$WORKFLOW_SHA"
+          git init source
+          git -C source remote add origin https://github.com/lewisco/litellm.git
+          git -C source fetch --depth=1 origin "$SOURCE_COMMIT"
+          git -C source checkout --detach FETCH_HEAD
+          test "$(git -C source rev-parse HEAD)" = "$SOURCE_COMMIT"
+      - name: Build, smoke and publish
+        shell: bash
+        env:
+          SOURCE_DIR: source
+          PROOF_DIR: image-proof
+          BUILD_RUN_ID: ${{ github.run_id }}
+          WORKFLOW_SHA: ${{ github.sha }}
+          IMAGE_TAG: ghcr.io/lewisco/litellm:customers-permissions-8daedbc4ed50-20261010T132026Z
+          REGISTRY_HOST: ghcr.io
+          REGISTRY_USER: ${{ github.repository_owner }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISH_IMAGE: "true"
+        run: bash workflow/.gitea/scripts/build-customers-permissions-image.sh

@@ -1,0 +1,42 @@
+name: Customers and permissions image
+
+on:
+  push:
+    branches:
+      - litellm_customers_combined
+    paths:
+      - .gitea/workflows/customers-permissions-image.yml
+      - .gitea/scripts/*customers-permissions-image.sh
+  workflow_dispatch:
+
+concurrency:
+  group: customers-permissions-image
+  cancel-in-progress: false
+
+jobs:
+  build-smoke-publish:
+    runs-on: ubuntu-26.04-amd64
+    timeout-minutes: 120
+    steps:
+      - name: Check out workflow
+        uses: https://github.com/actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          github-server-url: https://git.cobley.io
+          persist-credentials: false
+          path: workflow
+      - name: Check out approved application source
+        uses: https://github.com/actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          github-server-url: https://git.cobley.io
+          persist-credentials: false
+          path: source
+          ref: 8daedbc4ed501f52b8ec1569684e3b82fb60b92f
+      - name: Build, smoke and publish
+        shell: bash
+        env:
+          SOURCE_DIR: source
+          BUILD_RUN_ID: ${{ gitea.run_id }}
+          WORKFLOW_SHA: ${{ gitea.sha }}
+          PUBLISH_IMAGE: "true"
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+        run: bash workflow/.gitea/scripts/build-customers-permissions-image.sh
