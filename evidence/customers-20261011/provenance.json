@@ -1,0 +1,137 @@
+{
+  "body_images": {
+    "before": {
+      "width": 1440,
+      "height": 900,
+      "role": "Missing route, no authenticated page",
+      "theme": "light",
+      "capture_tip": "dff8131f1450f6b2c11ca09d5e6e37d863ec85a4",
+      "url": "http://127.0.0.1:30012/customers/",
+      "sha256": "13d12bf11193027769c7c5c9c89b8bb0a4c67c0f7b63b0469dd69e41ed79900a",
+      "red_boxes": [
+        [
+          570,
+          425,
+          870,
+          475
+        ]
+      ],
+      "annotation": "Only deterministic red outlines, original JPEG and decoded original PNG retained",
+      "file": "before.png"
+    },
+    "list": {
+      "width": 1440,
+      "height": 900,
+      "role": "Admin",
+      "theme": "light",
+      "capture_tip": "6dd47850c7dd48c0fafcaa574563672c4b2f5b6c",
+      "url": "http://127.0.0.1:30011/customers",
+      "sha256": "12137fc68ebb290b16d12f686f8cb540dc736e00eba41520039d279f1cb4ea2d",
+      "red_boxes": [
+        [
+          300,
+          80,
+          770,
+          195
+        ],
+        [
+          303,
+          278,
+          1398,
+          507
+        ],
+        [
+          303,
+          826,
+          1398,
+          873
+        ]
+      ],
+      "annotation": "Only deterministic red outlines, original JPEG and decoded original PNG retained",
+      "file": "list.png"
+    },
+    "overview": {
+      "width": 1440,
+      "height": 900,
+      "role": "Admin",
+      "theme": "light",
+      "capture_tip": "6dd47850c7dd48c0fafcaa574563672c4b2f5b6c",
+      "url": "http://127.0.0.1:30011/customers?customer=alice%40example.com",
+      "sha256": "5c34589a95233284f9224292aecad2c83c42d6354603c37f85419867226bda4c",
+      "red_boxes": [
+        [
+          303,
+          215,
+          1403,
+          528
+        ],
+        [
+          303,
+          548,
+          1403,
+          888
+        ]
+      ],
+      "annotation": "Only deterministic red outlines, original JPEG and decoded original PNG retained",
+      "file": "overview.png"
+    },
+    "settings": {
+      "width": 1440,
+      "height": 900,
+      "role": "Admin",
+      "theme": "light",
+      "capture_tip": "6dd47850c7dd48c0fafcaa574563672c4b2f5b6c",
+      "url": "http://127.0.0.1:30011/customers?customer=alice%40example.com",
+      "sha256": "2e4b11f186d831bc1b17d32fb4bca6855fcaf51631f937a2a0c6709f3b0457f1",
+      "red_boxes": [
+        [
+          303,
+          214,
+          1403,
+          520
+        ]
+      ],
+      "annotation": "Only deterministic red outlines, original JPEG and decoded original PNG retained",
+      "file": "settings.png"
+    },
+    "edit": {
+      "width": 1440,
+      "height": 900,
+      "role": "Admin",
+      "theme": "light",
+      "capture_tip": "6dd47850c7dd48c0fafcaa574563672c4b2f5b6c",
+      "url": "http://127.0.0.1:30011/customers?customer=alice%40example.com",
+      "sha256": "63b1fd89294d46a070d8e2d624f8f9545ea9cab6035bdbda6995cd3421d24506",
+      "red_boxes": [
+        [
+          301,
+          447,
+          979,
+          807
+        ]
+      ],
+      "annotation": "Only deterministic red outlines, original JPEG and decoded original PNG retained",
+      "file": "edit.png"
+    },
+    "create": {
+      "width": 1440,
+      "height": 900,
+      "role": "Admin",
+      "theme": "light",
+      "capture_tip": "6dd47850c7dd48c0fafcaa574563672c4b2f5b6c",
+      "url": "http://127.0.0.1:30011/customers",
+      "sha256": "c23f75e6d3677759c87febe63e80e8892cdbca5a9b5fecdbbccb25389579e418",
+      "red_boxes": [
+        [
+          385,
+          17,
+          1054,
+          885
+        ]
+      ],
+      "annotation": "Only deterministic red outlines, original JPEG and decoded original PNG retained",
+      "file": "create.png"
+    }
+  },
+  "live_premium_available": false
+}
