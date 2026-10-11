@@ -5,9 +5,9 @@
       "height": 900,
       "role": "Missing route, no authenticated page",
       "theme": "light",
-      "capture_tip": "dff8131f1450f6b2c11ca09d5e6e37d863ec85a4",
+      "capture_tip": "8ccb111de4cefd79be0cbbda054050d7243da5de",
       "url": "http://127.0.0.1:30012/customers/",
-      "sha256": "13d12bf11193027769c7c5c9c89b8bb0a4c67c0f7b63b0469dd69e41ed79900a",
+      "sha256": "56a3fe8fad1b468e7efe5515373984c76ca0185be1162f8b94e3e2bf7fbd3c41",
       "red_boxes": [
         [
           570,
@@ -24,9 +24,9 @@
       "height": 900,
       "role": "Admin",
       "theme": "light",
-      "capture_tip": "6dd47850c7dd48c0fafcaa574563672c4b2f5b6c",
+      "capture_tip": "f2e41384ef8a13eb74cdfd4bb7fa2d01c1147b8d",
       "url": "http://127.0.0.1:30011/customers",
-      "sha256": "12137fc68ebb290b16d12f686f8cb540dc736e00eba41520039d279f1cb4ea2d",
+      "sha256": "10928fc217314435b74fbfd378285bdba46726bb09e9da6cc9044c2a5793be07",
       "red_boxes": [
         [
           300,
@@ -55,9 +55,9 @@
       "height": 900,
       "role": "Admin",
       "theme": "light",
-      "capture_tip": "6dd47850c7dd48c0fafcaa574563672c4b2f5b6c",
+      "capture_tip": "f2e41384ef8a13eb74cdfd4bb7fa2d01c1147b8d",
       "url": "http://127.0.0.1:30011/customers?customer=alice%40example.com",
-      "sha256": "5c34589a95233284f9224292aecad2c83c42d6354603c37f85419867226bda4c",
+      "sha256": "e4b68844e606ab5cc8960dc65441dad667fa2ded4a212e9857a5ac3614ccf923",
       "red_boxes": [
         [
           303,
@@ -80,9 +80,9 @@
       "height": 900,
       "role": "Admin",
       "theme": "light",
-      "capture_tip": "6dd47850c7dd48c0fafcaa574563672c4b2f5b6c",
+      "capture_tip": "f2e41384ef8a13eb74cdfd4bb7fa2d01c1147b8d",
       "url": "http://127.0.0.1:30011/customers?customer=alice%40example.com",
-      "sha256": "2e4b11f186d831bc1b17d32fb4bca6855fcaf51631f937a2a0c6709f3b0457f1",
+      "sha256": "401ec1a87e137a213a10948336159fb4a3db87c1d621bbf5913f590b2434e62f",
       "red_boxes": [
         [
           303,
@@ -99,9 +99,9 @@
       "height": 900,
       "role": "Admin",
       "theme": "light",
-      "capture_tip": "6dd47850c7dd48c0fafcaa574563672c4b2f5b6c",
+      "capture_tip": "f2e41384ef8a13eb74cdfd4bb7fa2d01c1147b8d",
       "url": "http://127.0.0.1:30011/customers?customer=alice%40example.com",
-      "sha256": "63b1fd89294d46a070d8e2d624f8f9545ea9cab6035bdbda6995cd3421d24506",
+      "sha256": "e64db94df6411d04d8b8172b978e5ec5d5206906d8a5699acc1cf0d8a6f99f52",
       "red_boxes": [
         [
           301,
@@ -118,9 +118,9 @@
       "height": 900,
       "role": "Admin",
       "theme": "light",
-      "capture_tip": "6dd47850c7dd48c0fafcaa574563672c4b2f5b6c",
+      "capture_tip": "f2e41384ef8a13eb74cdfd4bb7fa2d01c1147b8d",
       "url": "http://127.0.0.1:30011/customers",
-      "sha256": "c23f75e6d3677759c87febe63e80e8892cdbca5a9b5fecdbbccb25389579e418",
+      "sha256": "2caa8e9f305c4f37c243f85562b8e37ccca75d05d21ee7d0f512061807180d92",
       "red_boxes": [
         [
           385,
