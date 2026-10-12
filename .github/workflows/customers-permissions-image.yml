@@ -26,7 +26,7 @@ jobs:
         shell: bash
         env:
           WORKFLOW_SHA: ${{ github.sha }}
-          SOURCE_COMMIT: 8daedbc4ed501f52b8ec1569684e3b82fb60b92f
+          SOURCE_COMMIT: 987f9f69771aa3305929e09aa95197b619d96403
         run: |
           set -euo pipefail
           git init workflow
@@ -46,7 +46,7 @@ jobs:
           PROOF_DIR: image-proof
           BUILD_RUN_ID: ${{ github.run_id }}
           WORKFLOW_SHA: ${{ github.sha }}
-          IMAGE_TAG: ghcr.io/lewisco/litellm:customers-permissions-8daedbc4ed50-20261010T132026Z
+          IMAGE_TAG: ghcr.io/lewisco/litellm:customers-permissions-987f9f69771a-20261012T020917Z
           REGISTRY_HOST: ghcr.io
           REGISTRY_USER: ${{ github.repository_owner }}
           REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
