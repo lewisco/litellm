@@ -30,7 +30,7 @@ jobs:
           github-server-url: https://git.cobley.io
           persist-credentials: false
           path: source
-          ref: 987f9f69771aa3305929e09aa95197b619d96403
+          ref: 19d3b4bd32d7426b2397d3fbccb3039675b5d4f2
       - name: Build, smoke and publish
         shell: bash
         env:

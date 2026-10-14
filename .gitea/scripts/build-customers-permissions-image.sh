@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly source_sha=987f9f69771aa3305929e09aa95197b619d96403
+readonly source_sha=19d3b4bd32d7426b2397d3fbccb3039675b5d4f2
 readonly source_dir="$(git -C "${SOURCE_DIR:-.}" rev-parse --show-toplevel)"
 readonly script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 readonly build_dir="$(mktemp -d)"

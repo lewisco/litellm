@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly source_sha=987f9f69771aa3305929e09aa95197b619d96403
+readonly source_sha=19d3b4bd32d7426b2397d3fbccb3039675b5d4f2
 readonly image="${IMAGE_TAG:?Set IMAGE_TAG to the image to verify}"
 readonly source_dir="$(cd -- "${SOURCE_DIR:?Set SOURCE_DIR to the approved source archive}" && pwd)"
 readonly proof_dir="${PROOF_DIR:?Set PROOF_DIR to the smoke output directory}"
