@@ -1,23 +1,44 @@
 "use client";
 
-import { Contact, RefreshCw, Search } from "lucide-react";
-import { useMemo } from "react";
+import type { RowSelectionState } from "@tanstack/react-table";
+import { Ban, Contact, Download, Pencil, Search, ShieldCheck } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import type { EndUser } from "@/app/(dashboard)/hooks/customers/useCustomers";
-import { DataTable, DataTableViewOptions, useUrlTableState } from "@/components/shared/DataTable";
-import { Input } from "@/components/ui/input";
+import {
+  createSelectionColumn,
+  DataTable,
+  DataTableFilterDrawer,
+  DataTableFilterField,
+  DataTableToolbar,
+  useUrlTableState,
+} from "@/components/shared/DataTable";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "@/lib/toast";
 
+import { MAX_BULK_CUSTOMERS } from "./bulkCustomerPayload";
+import { BulkEditCustomersModal } from "./BulkEditCustomersModal";
+import { exportCustomersToCsv } from "./customerCsvExport";
+import {
+  CUSTOMER_FILTER_FIELDS,
+  customerFilterFn,
+  customerMatchesSearch,
+  formatCustomerFilterValue,
+} from "./customerFilters";
 import { getCustomerTableColumns, type CustomerTableActions } from "./CustomersTableColumns";
 
 const TABLE_STATE_OPTIONS = {
   sortFields: ["user_id", "spend", "max_budget", "blocked"],
   defaultSort: { id: "user_id", desc: false },
   defaultPageSize: 50,
-  filterColumns: [],
+  filterColumns: CUSTOMER_FILTER_FIELDS.map((field) => field.id),
 };
 
 const DEFAULT_COLUMN_VISIBILITY = { mcp_access: false };
+const FILTER_LABELS = Object.fromEntries(CUSTOMER_FILTER_FIELDS.map((field) => [field.id, field.label]));
 
 type CustomersTableProps = CustomerTableActions & {
   data: EndUser[];
@@ -25,6 +46,7 @@ type CustomersTableProps = CustomerTableActions & {
   isError: boolean;
   onRefresh: () => void;
   isRefreshing: boolean;
+  onBulkSetBlocked: (userIds: string[], blocked: boolean) => Promise<boolean>;
 };
 
 function EmptyCustomers() {
@@ -37,62 +59,237 @@ function EmptyCustomers() {
   );
 }
 
+function BulkBlockedStateButton({
+  blocked,
+  premiumUser,
+  disabled,
+  onClick,
+}: {
+  blocked: boolean;
+  premiumUser: boolean;
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  const button = (
+    <Button variant="outline" size="sm" disabled={disabled || !premiumUser} onClick={onClick}>
+      {blocked ? <Ban /> : <ShieldCheck />}
+      {blocked ? "Block selected" : "Unblock selected"}
+    </Button>
+  );
+  if (premiumUser) return button;
+  return (
+    <TooltipProvider delay={300}>
+      <Tooltip>
+        <TooltipTrigger render={<span aria-label={`Bulk ${blocked ? "Block" : "Unblock"} requires Enterprise`} />}>
+          {button}
+        </TooltipTrigger>
+        <TooltipContent role="tooltip">
+          This is a LiteLLM Enterprise feature, and requires a valid key to use.
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 export default function CustomersTable({
   data,
   isLoading,
   isError,
   onRefresh,
   isRefreshing,
+  isBlocking,
+  onBulkSetBlocked,
   ...actions
 }: CustomersTableProps) {
-  const { search, setSearch, sorting, onSortingChange, pagination, onPaginationChange } =
-    useUrlTableState(TABLE_STATE_OPTIONS);
+  const {
+    search,
+    setSearch,
+    sorting,
+    onSortingChange,
+    pagination,
+    onPaginationChange,
+    columnFilters,
+    onColumnFiltersChange,
+  } = useUrlTableState(TABLE_STATE_OPTIONS);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [bulkEditCustomers, setBulkEditCustomers] = useState<EndUser[] | null>(null);
+  const isBusy = isBlocking || bulkEditCustomers !== null;
+  const filterScope = JSON.stringify([search, columnFilters]);
+  const [selectionScope, setSelectionScope] = useState(filterScope);
+  if (selectionScope !== filterScope) {
+    setSelectionScope(filterScope);
+    setRowSelection({});
+  }
   const { canModify, premiumUser, onView, onEdit, onDelete, onSetBlocked } = actions;
   const columns = useMemo(() => {
-    const columnActions = { canModify, premiumUser, onView, onEdit, onDelete, onSetBlocked };
-    return getCustomerTableColumns(columnActions);
-  }, [canModify, premiumUser, onView, onEdit, onDelete, onSetBlocked]);
-  const filteredCustomers = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    return data.filter((customer) => `${customer.user_id} ${customer.alias ?? ""}`.toLowerCase().includes(query));
-  }, [data, search]);
+    const columnActions = { canModify, premiumUser, isBlocking: isBusy, onView, onEdit, onDelete, onSetBlocked };
+    const customerColumns = getCustomerTableColumns(columnActions).map((column) =>
+      CUSTOMER_FILTER_FIELDS.some((field) => field.id === column.id)
+        ? { ...column, filterFn: customerFilterFn }
+        : column,
+    );
+    return canModify
+      ? [
+          createSelectionColumn<EndUser>({ rowAriaLabel: (row) => `Select customer ${row.original.user_id}` }),
+          ...customerColumns,
+        ]
+      : customerColumns;
+  }, [canModify, premiumUser, isBusy, onView, onEdit, onDelete, onSetBlocked]);
+  const searchedCustomers = useMemo(
+    () => data.filter((customer) => customerMatchesSearch(customer, search)),
+    [data, search],
+  );
+
+  const handleBulkSetBlocked = async (userIds: string[], blocked: boolean) => {
+    const canSetBlocked = canModify && !isBusy && premiumUser;
+    if (!userIds.length || !canSetBlocked) return;
+    if (await onBulkSetBlocked(userIds, blocked)) setRowSelection({});
+  };
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <DataTable
         fillHeight
         pageSizeOptions={[25, 50, 100]}
-        data={filteredCustomers}
+        data={searchedCustomers}
         columns={columns}
         getRowId={(customer) => customer.user_id}
         defaultColumnVisibility={DEFAULT_COLUMN_VISIBILITY}
-        toolbar={(table) => (
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="relative">
-              <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                aria-label="Search customers"
-                placeholder="Search customers by ID or alias"
-                className="h-8 w-56 pl-8"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-              />
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon-sm"
-                onClick={onRefresh}
-                disabled={isRefreshing}
-                aria-label="Refresh"
-                title="Refresh"
+        enableRowSelection={canModify && !isBusy}
+        rowSelection={rowSelection}
+        onRowSelectionChange={(updater) => {
+          if (!isBusy) setRowSelection(updater);
+        }}
+        toolbar={(table) => {
+          const selectedCustomers = table.getFilteredSelectedRowModel().rows.map((row) => row.original);
+          return (
+            <>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative">
+                  <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    aria-label="Search customers"
+                    placeholder="Search customers by ID or alias"
+                    className="h-8 w-56 pl-8"
+                    value={search}
+                    onChange={(event) => {
+                      setRowSelection({});
+                      setSearch(event.target.value);
+                    }}
+                  />
+                </div>
+                <DataTableToolbar
+                  className="flex-1"
+                  table={table}
+                  onRefresh={onRefresh}
+                  isRefreshing={isRefreshing}
+                  onOpenFilters={() => setFiltersOpen(true)}
+                  filterLabels={FILTER_LABELS}
+                  formatFilterValue={formatCustomerFilterValue}
+                >
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={isLoading || isError || table.getFilteredRowModel().rows.length === 0}
+                    onClick={() => {
+                      try {
+                        const count = exportCustomersToCsv(
+                          table.getPrePaginationRowModel().rows.map((row) => row.original),
+                        );
+                        toast.success(`Exported ${count} customers`);
+                      } catch (error) {
+                        toast.fromError(error);
+                      }
+                    }}
+                  >
+                    <Download />
+                    Export CSV
+                  </Button>
+                </DataTableToolbar>
+              </div>
+              {canModify && selectedCustomers.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm text-muted-foreground">{selectedCustomers.length} selected</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={isBusy || selectedCustomers.length > MAX_BULK_CUSTOMERS}
+                    onClick={() => setBulkEditCustomers(selectedCustomers)}
+                  >
+                    <Pencil />
+                    Edit selected
+                  </Button>
+                  {selectedCustomers.length > MAX_BULK_CUSTOMERS && (
+                    <span className="text-sm text-muted-foreground">
+                      Select at most {MAX_BULK_CUSTOMERS} customers to edit at once
+                    </span>
+                  )}
+                  <BulkBlockedStateButton
+                    blocked
+                    premiumUser={premiumUser}
+                    disabled={isBusy}
+                    onClick={() =>
+                      void handleBulkSetBlocked(
+                        selectedCustomers.map((customer) => customer.user_id),
+                        true,
+                      )
+                    }
+                  />
+                  <BulkBlockedStateButton
+                    blocked={false}
+                    premiumUser={premiumUser}
+                    disabled={isBusy}
+                    onClick={() =>
+                      void handleBulkSetBlocked(
+                        selectedCustomers.map((customer) => customer.user_id),
+                        false,
+                      )
+                    }
+                  />
+                  <Button variant="ghost" size="sm" disabled={isBusy} onClick={() => setRowSelection({})}>
+                    Clear selection
+                  </Button>
+                </div>
+              )}
+              <DataTableFilterDrawer
+                table={table}
+                open={filtersOpen}
+                onOpenChange={setFiltersOpen}
+                description="Filter by status, a budget limit and configured MCP grants"
               >
-                <RefreshCw className={isRefreshing ? "animate-spin" : ""} />
-              </Button>
-              <DataTableViewOptions table={table} label="Columns" />
-            </div>
-          </div>
-        )}
+                {({ get, set }) =>
+                  CUSTOMER_FILTER_FIELDS.map((field) => (
+                    <DataTableFilterField key={field.id} label={field.label}>
+                      <Select
+                        value={(get(field.id) as string) || "all"}
+                        onValueChange={(value) => set(field.id, value === "all" ? undefined : value)}
+                      >
+                        <SelectTrigger aria-label={field.label} className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All</SelectItem>
+                          {field.options.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </DataTableFilterField>
+                  ))
+                }
+              </DataTableFilterDrawer>
+            </>
+          );
+        }}
+        filterMode="client"
+        columnFilters={columnFilters}
+        onColumnFiltersChange={(updater) => {
+          setRowSelection({});
+          onColumnFiltersChange(updater);
+        }}
         paginationMode="client"
         pagination={pagination}
         onPaginationChange={onPaginationChange}
@@ -105,6 +302,18 @@ export default function CustomersTable({
         noDataMessage={<EmptyCustomers />}
         size="compact"
       />
+      {canModify && bulkEditCustomers && (
+        <BulkEditCustomersModal
+          open
+          selectedCustomers={bulkEditCustomers}
+          onCancel={() => setBulkEditCustomers(null)}
+          onCompleted={(successfulIds) =>
+            setRowSelection((selection) =>
+              Object.fromEntries(Object.entries(selection).filter(([id]) => !successfulIds.includes(id))),
+            )
+          }
+        />
+      )}
     </div>
   );
 }

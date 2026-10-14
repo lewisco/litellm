@@ -14,7 +14,7 @@ from collections.abc import Mapping, Sequence
 from collections.abc import Set as AbstractSet
 from datetime import datetime, timedelta
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Final, NamedTuple, Protocol, TypeVar, overload
+from typing import TYPE_CHECKING, Annotated, Final, NamedTuple, Protocol, TypeVar, overload
 
 import fastapi
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -39,20 +39,25 @@ from litellm.proxy.common_utils.user_api_key_cache import (
 from litellm.proxy.management_endpoints.common_daily_activity import get_daily_activity
 from litellm.proxy.management_endpoints.common_utils import validate_budget_duration
 from litellm.proxy.management_helpers.object_permission_utils import (  # noqa: F401  # legacy module exports
+    ObjectPermissionClient,
+    ObjectPermissionUpsert,
     _set_object_permission,  # pyright: ignore[reportPrivateUsage,reportUnusedImport]  # backwards-compatible package export
-    handle_update_object_permission_common,
+    prepare_object_permission_upsert,
     set_object_permission,
 )
 from litellm.proxy.utils import handle_exception_on_proxy
 from litellm.repositories.budget_repository import BudgetRepository
 from litellm.repositories.chunked_in import find_many_in
+from litellm.repositories.object_permission_repository import ObjectPermissionRepository
 from litellm.repositories.table_repositories import EndUserRepository
 from litellm.types.proxy.management_endpoints.common_daily_activity import (
     SpendAnalyticsPaginatedResponse,
 )
 from litellm.types.proxy.management_endpoints.customer_endpoints import (
     BlockUsersResponse,
+    BulkUpdateCustomerResponse,
     CustomerResponse,
+    CustomerUpdateResult,
     DeleteCustomersResponse,
     UnblockUsersResponse,
 )
@@ -61,6 +66,7 @@ _RowT_co: Final = TypeVar("_RowT_co", covariant=True)
 _STR_OBJECT_DICT: Final = TypeAdapter(dict[str, object])
 _STRING_IDS: Final = TypeAdapter(tuple[str, ...])
 _CLEARABLE_LIST_FIELDS: Final = frozenset({"models"})
+_CUSTOMER_UPDATE_LOCK_SQL: Final = 'SELECT "user_id" FROM "LiteLLM_EndUserTable" WHERE "user_id" = $1 FOR UPDATE'
 
 
 def _should_update_field(field: str, value: object, sent_fields: AbstractSet[str]) -> bool:
@@ -306,34 +312,39 @@ def new_budget_request(data: NewCustomerRequest) -> BudgetNewRequest | None:
     return None
 
 
-async def _handle_customer_object_permission_update(
-    non_default_values: dict[str, object],
-    end_user_table_data_typed: LiteLLM_EndUserTable | None,
-    update_end_user_table_data: dict[str, object],
-    prisma_client: "PrismaClient",
-) -> None:
-    """
-    Handle object permission updates for customer endpoints.
+async def _prepare_customer_object_permission_update(
+    data: UpdateCustomerRequest,
+    existing_object_permission_id: str | None,
+    prisma_client: ObjectPermissionClient,
+) -> ObjectPermissionUpsert | None:
+    if data.object_permission is None:
+        return None
+    return await prepare_object_permission_upsert(
+        new_object_permission=_STR_OBJECT_DICT.validate_python(data.object_permission.model_dump()),
+        existing_object_permission_id=existing_object_permission_id,
+        prisma_client=prisma_client,
+    )
 
-    Updates the update_end_user_table_data dict in place with the new object_permission_id.
 
-    Args:
-        non_default_values: Dictionary containing the update values including object_permission
-        end_user_table_data_typed: Existing end user table data
-        update_end_user_table_data: Dictionary to update with new object_permission_id
-        prisma_client: Prisma database client
-    """
-    if "object_permission" in non_default_values:
-        existing_object_permission_id: Final = (
-            end_user_table_data_typed.object_permission_id if end_user_table_data_typed is not None else None
+async def _write_customer_budget_update(
+    tx: ObjectPermissionClient,
+    budget_data: Mapping[str, object],
+    existing_budget: LiteLLM_BudgetTable | None,
+    updated_by: str,
+) -> str | None:
+    if not budget_data:
+        return None
+    if existing_budget is not None:
+        await _typed_table(BudgetRepository(tx)).update(
+            where={"budget_id": existing_budget.budget_id},
+            data=budget_data,
         )
-        object_permission_id: Final = await handle_update_object_permission_common(
-            data_json=non_default_values,
-            existing_object_permission_id=existing_object_permission_id,
-            prisma_client=prisma_client,
-        )
-        if object_permission_id is not None:
-            update_end_user_table_data["object_permission_id"] = object_permission_id
+        return None
+    budget: Final = await _typed_table(BudgetRepository(tx)).create(
+        data={**budget_data, "created_by": updated_by, "updated_by": updated_by},
+        include={"end_users": True},
+    )
+    return budget.budget_id
 
 
 @router.post(
@@ -610,6 +621,99 @@ async def end_user_info(
         raise handle_exception_on_proxy(e)
 
 
+async def _update_single_customer(
+    data: UpdateCustomerRequest,
+    user_api_key_dict: UserAPIKeyAuth,
+) -> CustomerResponse | ProxyException:
+    from litellm.proxy.proxy_server import litellm_proxy_admin_name, prisma_client
+
+    try:
+        data_json: Final = _STR_OBJECT_DICT.validate_python(data.json())
+        if prisma_client is None:
+            raise Exception("Not connected to DB!")
+
+        sent_fields: Final = data.fields_set()
+        non_default_values: Final[dict[str, object]] = {
+            k: v for k, v in data_json.items() if _should_update_field(k, v, sent_fields)
+        }
+
+        budget_table_data: Final = {
+            field: value
+            for field, value in non_default_values.items()
+            if field != "budget_id" and field in LiteLLM_BudgetTable.model_fields
+        }
+        customer_table_data: Final = {
+            field: value
+            for field, value in non_default_values.items()
+            if field == "budget_id"
+            or (
+                field in LiteLLM_EndUserTable.model_fields
+                and field not in LiteLLM_BudgetTable.model_fields
+                and field != "object_permission"
+            )
+        }
+        async with prisma_client.tx() as transaction:
+            tx: Final = ObjectPermissionClient(db=transaction)
+            customer_locked: Final = bool(await transaction.query_raw(_CUSTOMER_UPDATE_LOCK_SQL, data.user_id))
+            end_user_table_data: Final = (
+                await _typed_table(EndUserRepository(tx)).find_first(
+                    where={"user_id": data.user_id}, include={"litellm_budget_table": True}
+                )
+                if customer_locked
+                else None
+            )
+            if end_user_table_data is None:
+                raise ProxyException(
+                    message=f"End User Id={data.user_id} does not exist in db",
+                    type="not_found",
+                    code=404,
+                    param="user_id",
+                )
+            if not data.user_id:
+                raise ValueError(f"user_id is required, passed user_id = {data.user_id}")
+            end_user_table_data_typed: Final = LiteLLM_EndUserTable.model_validate(end_user_table_data.model_dump())
+            permission_upsert: Final = await _prepare_customer_object_permission_update(
+                data=data,
+                existing_object_permission_id=end_user_table_data_typed.object_permission_id,
+                prisma_client=tx,
+            )
+            permission: Final = (
+                await ObjectPermissionRepository(tx).table.upsert(
+                    where={"object_permission_id": permission_upsert.object_permission_id},
+                    data={"create": permission_upsert.record, "update": permission_upsert.update_record},
+                )
+                if permission_upsert is not None
+                else None
+            )
+            budget_id: Final = await _write_customer_budget_update(
+                tx=tx,
+                budget_data=budget_table_data,
+                existing_budget=end_user_table_data_typed.litellm_budget_table,
+                updated_by=user_api_key_dict.user_id or litellm_proxy_admin_name,
+            )
+            update_data: Final = {
+                **customer_table_data,
+                "user_id": data.user_id,
+                **({"object_permission_id": permission.object_permission_id} if permission is not None else {}),
+                **({"budget_id": budget_id} if budget_id is not None else {}),
+            }
+            response: Final = await _typed_table(EndUserRepository(tx)).update(
+                where={"user_id": data.user_id},
+                data=update_data,
+                include={"litellm_budget_table": True, "object_permission": True},
+            )
+            if response is None:
+                raise ValueError(f"Failed updating customer data. User ID does not exist passed user_id={data.user_id}")
+            customer_response: Final = _to_customer_response(response)
+        await _evict_end_user_cache_keys(_end_user_cache_keys((data.user_id,)))
+
+    except Exception as e:
+        verbose_proxy_logger.exception("litellm.proxy.proxy_server.update_end_user(): Exception occured - %s", e)
+        return handle_exception_on_proxy(e)
+    else:
+        return customer_response
+
+
 @router.post(
     "/customer/update",
     tags=["Customer Management"],
@@ -627,7 +731,7 @@ async def update_end_user(
     user_api_key_dict: UserAPIKeyAuth = Depends(user_api_key_auth),
 ) -> CustomerResponse:
     """
-    Example curl 
+    Example curl
 
     Parameters:
     - user_id: str
@@ -646,12 +750,13 @@ async def update_end_user(
         Supported fields:
         * mcp_servers: List[str] - List of allowed MCP server IDs
         * mcp_access_groups: List[str] - List of MCP access group names
+        * mcp_toolsets: List[str] - List of allowed MCP toolset IDs
         * mcp_tool_permissions: Dict[str, List[str]] - Map of server ID to allowed tool names
         * vector_stores: List[str] - List of allowed vector store IDs
         * agents: List[str] - List of allowed agent IDs
         * agent_access_groups: List[str] - List of agent access group names
         Example: {"mcp_servers": ["server_1"], "vector_stores": ["vector_store_1"]}
-        IF null or {} then no object-level restrictions apply.
+        Omitted permission fields retain their existing values. Supplying null or {} leaves permissions unchanged.
 
     Example curl:
     ```
@@ -680,114 +785,70 @@ async def update_end_user(
     ```
     """
 
-    from litellm.proxy.proxy_server import litellm_proxy_admin_name, prisma_client
+    result: Final = await _update_single_customer(data=data, user_api_key_dict=user_api_key_dict)
+    if isinstance(result, ProxyException):
+        raise result
+    return result
 
-    try:
-        data_json: Final = _STR_OBJECT_DICT.validate_python(data.json())
-        # get the row from db
-        if prisma_client is None:
-            raise Exception("Not connected to DB!")
 
-        sent_fields: Final = data.fields_set()
-        non_default_values: Final[dict[str, object]] = {
-            k: v for k, v in data_json.items() if _should_update_field(k, v, sent_fields)
-        }
+async def _update_customer_result(
+    data: UpdateCustomerRequest,
+    user_api_key_dict: UserAPIKeyAuth,
+) -> CustomerUpdateResult:
+    result: Final = await _update_single_customer(data=data, user_api_key_dict=user_api_key_dict)
+    if isinstance(result, ProxyException):
+        return CustomerUpdateResult(user_id=data.user_id, success=False, error=str(result))
+    return CustomerUpdateResult(user_id=data.user_id, success=True, updated_customer=result)
 
-        ## Get end user table data ##
-        end_user_table_data: Final = await _typed_table(EndUserRepository(prisma_client)).find_first(
-            where={"user_id": data.user_id}, include={"litellm_budget_table": True}
-        )
 
-        if end_user_table_data is None:
-            raise ProxyException(
-                message=f"End User Id={data.user_id} does not exist in db",
-                type="not_found",
-                code=404,
-                param="user_id",
-            )
+@router.post(
+    "/customer/bulk_update",
+    tags=["Customer Management"],
+    dependencies=[Depends(user_api_key_auth)],
+    response_model=BulkUpdateCustomerResponse,
+)
+@router.post(
+    "/end_user/bulk_update",
+    tags=["Customer Management"],
+    include_in_schema=False,
+    dependencies=[Depends(user_api_key_auth)],
+    response_model=BulkUpdateCustomerResponse,
+)
+async def bulk_customer_update(
+    data: BulkUpdateCustomerRequest,
+    user_api_key_dict: Annotated[UserAPIKeyAuth, Depends(user_api_key_auth)],
+) -> BulkUpdateCustomerResponse:
+    """Update up to 500 customers independently using the same fields as `/customer/update`.
 
-        end_user_table_data_typed: Final = LiteLLM_EndUserTable.model_validate(end_user_table_data.model_dump())
+    Supply a `customers` array of customer updates. Each result contains the `user_id`,
+    `success`, and either `updated_customer` or `error`, in request order. A failed update
+    does not prevent the remaining customers from being updated. Object permission fields
+    omitted from an update retain their existing values, and supplied permission lists
+    replace that field. Only proxy admins can update customers.
 
-        ## Get budget table data ##
-        end_user_budget_table: Final = end_user_table_data_typed.litellm_budget_table
-
-        ## Get all params for budget table ##
-        budget_table_data: Final = dict[str, object]()
-        update_end_user_table_data: Final = dict[str, object]()
-        for k, v in non_default_values.items():
-            # budget_id is for linking to existing budget, not for creating new budget
-            if k == "budget_id":
-                update_end_user_table_data[k] = v
-            elif k in LiteLLM_BudgetTable.model_fields:
-                budget_table_data[k] = v
-
-            elif k in LiteLLM_EndUserTable.model_fields:
-                update_end_user_table_data[k] = v
-
-        ## Handle object permission updates (MCP servers, vector stores, etc.)
-        await _handle_customer_object_permission_update(
-            non_default_values=non_default_values,
-            end_user_table_data_typed=end_user_table_data_typed,
-            update_end_user_table_data=update_end_user_table_data,
-            prisma_client=prisma_client,
-        )
-
-        ## Check if we need to create a new budget (only if budget fields are provided, not just budget_id) ##
-        if budget_table_data:
-            if end_user_budget_table is None:
-                ## Create new budget ##
-                budget_table_data_record = await _typed_table(BudgetRepository(prisma_client)).create(
-                    data={
-                        **budget_table_data,
-                        "created_by": user_api_key_dict.user_id or litellm_proxy_admin_name,
-                        "updated_by": user_api_key_dict.user_id or litellm_proxy_admin_name,
-                    },
-                    include={"end_users": True},
-                )
-
-                update_end_user_table_data["budget_id"] = budget_table_data_record.budget_id
-            else:
-                ## Update existing budget ##
-                budget_table_data_record = await _typed_table(BudgetRepository(prisma_client)).update(
-                    where={"budget_id": end_user_budget_table.budget_id},
-                    data=budget_table_data,
-                )
-
-        ## Update user table, with update params + new budget id (if set) ##
-        verbose_proxy_logger.debug("/customer/update: Received data = %s", data)
-
-        # Ensure object_permission is not in the update data
-        # It should have been converted to object_permission_id by handle_update_object_permission_common
-        if "object_permission" in update_end_user_table_data:
-            verbose_proxy_logger.warning(
-                "object_permission still in update_end_user_table_data: %s",
-                update_end_user_table_data.get("object_permission"),
-            )
-            update_end_user_table_data.pop("object_permission", None)
-
-        if data.user_id is not None and len(data.user_id) > 0:
-            update_end_user_table_data["user_id"] = data.user_id
-            verbose_proxy_logger.debug("In update customer, user_id condition block.")
-            response: Final = await _typed_table(EndUserRepository(prisma_client)).update(
-                where={"user_id": data.user_id},
-                data=update_end_user_table_data,
-                include={"litellm_budget_table": True, "object_permission": True},
-            )
-            if response is None:
-                raise ValueError(f"Failed updating customer data. User ID does not exist passed user_id={data.user_id}")
-            verbose_proxy_logger.debug("received response from updating prisma client. response=%s", response)
-
-            await _evict_end_user_cache_keys(_end_user_cache_keys((data.user_id,)))
-
-            return _to_customer_response(response)
-        else:
-            raise ValueError(f"user_id is required, passed user_id = {data.user_id}")
-
-        # update based on remaining passed in values
-
-    except Exception as e:
-        verbose_proxy_logger.exception("litellm.proxy.proxy_server.update_end_user(): Exception occured - %s", e)
-        raise handle_exception_on_proxy(e)
+    Example request body:
+    ```json
+    {
+      "customers": [
+        {"user_id": "customer-1", "object_permission": {"mcp_toolsets": ["toolset-1"]}},
+        {"user_id": "customer-2", "models": ["model-1"]}
+      ]
+    }
+    ```
+    """
+    results: Final = tuple(
+        [
+            await _update_customer_result(data=customer, user_api_key_dict=user_api_key_dict)
+            for customer in data.customers
+        ]
+    )
+    successful_updates: Final = sum(result.success for result in results)
+    return BulkUpdateCustomerResponse(
+        results=results,
+        total_requested=len(results),
+        successful_updates=successful_updates,
+        failed_updates=len(results) - successful_updates,
+    )
 
 
 @router.post(

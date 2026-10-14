@@ -2985,11 +2985,14 @@ export interface paths {
          *
          *     Updates the cost_discount_config in litellm_settings.
          *     Discounts should be between 0 and 1 (e.g., 0.05 = 5% discount).
+         *     A key may also be <provider>/<model-pattern>, where the pattern is an
+         *     fnmatch glob matched against the model name.
          *
          *     Example:
          *     ```json
          *     {
          *         "vertex_ai": 0.05,
+         *         "vertex_ai/claude-*": 0.20,
          *         "gemini": 0.05,
          *         "openai": 0.01
          *     }
@@ -4169,6 +4172,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/customer/bulk_update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Bulk Customer Update
+         * @description Update up to 500 customers independently using the same fields as `/customer/update`.
+         *
+         *     Supply a `customers` array of customer updates. Each result contains the `user_id`,
+         *     `success`, and either `updated_customer` or `error`, in request order. A failed update
+         *     does not prevent the remaining customers from being updated. Object permission fields
+         *     omitted from an update retain their existing values, and supplied permission lists
+         *     replace that field. Only proxy admins can update customers.
+         *
+         *     Example request body:
+         *     ```json
+         *     {
+         *       "customers": [
+         *         {"user_id": "customer-1", "object_permission": {"mcp_toolsets": ["toolset-1"]}},
+         *         {"user_id": "customer-2", "models": ["model-1"]}
+         *       ]
+         *     }
+         *     ```
+         */
+        post: operations["bulk_customer_update_customer_bulk_update_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/customer/daily/activity": {
         parameters: {
             query?: never;
@@ -4498,12 +4537,13 @@ export interface paths {
          *         Supported fields:
          *         * mcp_servers: List[str] - List of allowed MCP server IDs
          *         * mcp_access_groups: List[str] - List of MCP access group names
+         *         * mcp_toolsets: List[str] - List of allowed MCP toolset IDs
          *         * mcp_tool_permissions: Dict[str, List[str]] - Map of server ID to allowed tool names
          *         * vector_stores: List[str] - List of allowed vector store IDs
          *         * agents: List[str] - List of allowed agent IDs
          *         * agent_access_groups: List[str] - List of agent access group names
          *         Example: {"mcp_servers": ["server_1"], "vector_stores": ["vector_store_1"]}
-         *         IF null or {} then no object-level restrictions apply.
+         *         Omitted permission fields retain their existing values. Supplying null or {} leaves permissions unchanged.
          *
          *     Example curl:
          *     ```
@@ -4846,6 +4886,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/end_user/bulk_update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Bulk Customer Update
+         * @description Update up to 500 customers independently using the same fields as `/customer/update`.
+         *
+         *     Supply a `customers` array of customer updates. Each result contains the `user_id`,
+         *     `success`, and either `updated_customer` or `error`, in request order. A failed update
+         *     does not prevent the remaining customers from being updated. Object permission fields
+         *     omitted from an update retain their existing values, and supplied permission lists
+         *     replace that field. Only proxy admins can update customers.
+         *
+         *     Example request body:
+         *     ```json
+         *     {
+         *       "customers": [
+         *         {"user_id": "customer-1", "object_permission": {"mcp_toolsets": ["toolset-1"]}},
+         *         {"user_id": "customer-2", "models": ["model-1"]}
+         *       ]
+         *     }
+         *     ```
+         */
+        post: operations["bulk_customer_update_end_user_bulk_update_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/end_user/daily/activity": {
         parameters: {
             query?: never;
@@ -5175,12 +5251,13 @@ export interface paths {
          *         Supported fields:
          *         * mcp_servers: List[str] - List of allowed MCP server IDs
          *         * mcp_access_groups: List[str] - List of MCP access group names
+         *         * mcp_toolsets: List[str] - List of allowed MCP toolset IDs
          *         * mcp_tool_permissions: Dict[str, List[str]] - Map of server ID to allowed tool names
          *         * vector_stores: List[str] - List of allowed vector store IDs
          *         * agents: List[str] - List of allowed agent IDs
          *         * agent_access_groups: List[str] - List of agent access group names
          *         Example: {"mcp_servers": ["server_1"], "vector_stores": ["vector_store_1"]}
-         *         IF null or {} then no object-level restrictions apply.
+         *         Omitted permission fields retain their existing values. Supplying null or {} leaves permissions unchanged.
          *
          *     Example curl:
          *     ```
@@ -17296,6 +17373,7 @@ export interface paths {
          *         - capture_message_content: For OTel v2 callbacks, "no_content" or "span_only".
          *           An explicit value overrides the global setting for this destination; omitted follows the proxy's own callback for that backend, else the global setting.
          *           "span_only" puts prompt and response content on the destination's spans, "no_content" leaves it out
+         *         - excluded_services: For OTel v2 callbacks, a comma-separated list of datastore names such as "redis,postgres", or "none" to exclude nothing. An explicit value replaces the global exclusions; omitted follows them
          *         - gcs_bucket_name: The name of the GCS bucket
          *         - gcs_path_service_account: The path to the GCS service account
          *         - langsmith_api_key: The API key for the Langsmith callback
@@ -27720,6 +27798,25 @@ export interface components {
             /** Data */
             data: components["schemas"]["TeamMemberDeleteResult"][];
         };
+        /** BulkUpdateCustomerRequest */
+        BulkUpdateCustomerRequest: {
+            /**
+             * Customers
+             * @description Customer updates processed independently in request order
+             */
+            customers: components["schemas"]["UpdateCustomerRequest"][];
+        };
+        /** BulkUpdateCustomerResponse */
+        BulkUpdateCustomerResponse: {
+            /** Failed Updates */
+            failed_updates: number;
+            /** Results */
+            results: components["schemas"]["CustomerUpdateResult"][];
+            /** Successful Updates */
+            successful_updates: number;
+            /** Total Requested */
+            total_requested: number;
+        };
         /**
          * BulkUpdateKeyRequest
          * @description Request for bulk key updates
@@ -30899,6 +30996,16 @@ export interface components {
              * @default 0
              */
             spend: number;
+            /** User Id */
+            user_id: string;
+        };
+        /** CustomerUpdateResult */
+        CustomerUpdateResult: {
+            /** Error */
+            error?: string | null;
+            /** Success */
+            success: boolean;
+            updated_customer?: components["schemas"]["CustomerResponse"] | null;
             /** User Id */
             user_id: string;
         };
@@ -36620,6 +36727,11 @@ export interface components {
              * @description Custom message when a guardrail blocks an action. Supports placeholders like {tool_name}, {rule_id}, and {default_message}.
              */
             violation_message_template?: string | null;
+            /**
+             * Wingback App Id
+             * @description Wingback external gateway integration name for request attribution (sent as additional_provider_specific_params.wingback_app_id).
+             */
+            wingback_app_id?: string | null;
             /**
              * Xecguard Model
              * @description XecGuard scanning model identifier. Defaults to 'xecguard_v2'.
@@ -51945,6 +52057,7 @@ export interface operations {
                 code_challenge_method?: string | null;
                 response_type?: string | null;
                 resource?: string | null;
+                scope?: string | null;
             };
             header?: never;
             path?: never;
@@ -56347,6 +56460,39 @@ export interface operations {
             };
         };
     };
+    bulk_customer_update_customer_bulk_update_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkUpdateCustomerRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BulkUpdateCustomerResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_customer_daily_activity_customer_daily_activity_get: {
         parameters: {
             query?: {
@@ -56956,6 +57102,23 @@ export interface operations {
                  */
                 "application/json": {
                     /**
+                     * Audio
+                     * @description Clef-omni only. Up to 4 embedded audio clips, each a base64 data URL or {content_type, base64}
+                     * @default []
+                     */
+                    audio?: (string | {
+                        /**
+                         * Base64
+                         * @description Base64-encoded audio bytes
+                         */
+                        base64: string;
+                        /**
+                         * Content Type
+                         * @description An audio/* media type, such as audio/wav
+                         */
+                        content_type: string;
+                    })[];
+                    /**
                      * Input
                      * @description The text being judged, or user messages whose content mixes input_text and input_image parts
                      */
@@ -57076,6 +57239,23 @@ export interface operations {
                      * @description A stable id for your end user. Sent to OpenAI and dropped for other providers
                      */
                     safety_identifier?: string | null;
+                    /**
+                     * Videos
+                     * @description Clef-omni only. Up to 2 embedded videos, each a base64 data URL or {content_type, base64}
+                     * @default []
+                     */
+                    videos?: (string | {
+                        /**
+                         * Base64
+                         * @description Base64-encoded video bytes
+                         */
+                        base64: string;
+                        /**
+                         * Content Type
+                         * @description A video/* media type, such as video/mp4
+                         */
+                        content_type: string;
+                    })[];
                 } & {
                     [key: string]: unknown;
                 };
@@ -57319,6 +57499,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BlockUsersResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    bulk_customer_update_end_user_bulk_update_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkUpdateCustomerRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BulkUpdateCustomerResponse"];
                 };
             };
             /** @description Validation Error */
@@ -71250,6 +71463,23 @@ export interface operations {
                  */
                 "application/json": {
                     /**
+                     * Audio
+                     * @description Clef-omni only. Up to 4 embedded audio clips, each a base64 data URL or {content_type, base64}
+                     * @default []
+                     */
+                    audio?: (string | {
+                        /**
+                         * Base64
+                         * @description Base64-encoded audio bytes
+                         */
+                        base64: string;
+                        /**
+                         * Content Type
+                         * @description An audio/* media type, such as audio/wav
+                         */
+                        content_type: string;
+                    })[];
+                    /**
                      * Model
                      * @description A decision model from the proxy model_list
                      */
@@ -71338,6 +71568,23 @@ export interface operations {
                     state: string | {
                         [key: string]: unknown;
                     } | unknown[];
+                    /**
+                     * Videos
+                     * @description Clef-omni only. Up to 2 embedded videos, each a base64 data URL or {content_type, base64}
+                     * @default []
+                     */
+                    videos?: (string | {
+                        /**
+                         * Base64
+                         * @description Base64-encoded video bytes
+                         */
+                        base64: string;
+                        /**
+                         * Content Type
+                         * @description A video/* media type, such as video/mp4
+                         */
+                        content_type: string;
+                    })[];
                 } & {
                     [key: string]: unknown;
                 };
@@ -76557,6 +76804,23 @@ export interface operations {
                  */
                 "application/json": {
                     /**
+                     * Audio
+                     * @description Clef-omni only. Up to 4 embedded audio clips, each a base64 data URL or {content_type, base64}
+                     * @default []
+                     */
+                    audio?: (string | {
+                        /**
+                         * Base64
+                         * @description Base64-encoded audio bytes
+                         */
+                        base64: string;
+                        /**
+                         * Content Type
+                         * @description An audio/* media type, such as audio/wav
+                         */
+                        content_type: string;
+                    })[];
+                    /**
                      * Input
                      * @description The text being judged, or user messages whose content mixes input_text and input_image parts
                      */
@@ -76677,6 +76941,23 @@ export interface operations {
                      * @description A stable id for your end user. Sent to OpenAI and dropped for other providers
                      */
                     safety_identifier?: string | null;
+                    /**
+                     * Videos
+                     * @description Clef-omni only. Up to 2 embedded videos, each a base64 data URL or {content_type, base64}
+                     * @default []
+                     */
+                    videos?: (string | {
+                        /**
+                         * Base64
+                         * @description Base64-encoded video bytes
+                         */
+                        base64: string;
+                        /**
+                         * Content Type
+                         * @description A video/* media type, such as video/mp4
+                         */
+                        content_type: string;
+                    })[];
                 } & {
                     [key: string]: unknown;
                 };
@@ -79887,6 +80168,23 @@ export interface operations {
                  */
                 "application/json": {
                     /**
+                     * Audio
+                     * @description Clef-omni only. Up to 4 embedded audio clips, each a base64 data URL or {content_type, base64}
+                     * @default []
+                     */
+                    audio?: (string | {
+                        /**
+                         * Base64
+                         * @description Base64-encoded audio bytes
+                         */
+                        base64: string;
+                        /**
+                         * Content Type
+                         * @description An audio/* media type, such as audio/wav
+                         */
+                        content_type: string;
+                    })[];
+                    /**
                      * Model
                      * @description A decision model from the proxy model_list
                      */
@@ -79975,6 +80273,23 @@ export interface operations {
                     state: string | {
                         [key: string]: unknown;
                     } | unknown[];
+                    /**
+                     * Videos
+                     * @description Clef-omni only. Up to 2 embedded videos, each a base64 data URL or {content_type, base64}
+                     * @default []
+                     */
+                    videos?: (string | {
+                        /**
+                         * Base64
+                         * @description Base64-encoded video bytes
+                         */
+                        base64: string;
+                        /**
+                         * Content Type
+                         * @description A video/* media type, such as video/mp4
+                         */
+                        content_type: string;
+                    })[];
                 } & {
                     [key: string]: unknown;
                 };

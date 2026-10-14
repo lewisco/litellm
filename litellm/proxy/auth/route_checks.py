@@ -7,6 +7,7 @@ from fastapi import HTTPException, Request, status
 
 from litellm._logging import verbose_proxy_logger
 from litellm.proxy._types import (
+    UI_TEAM_ID,
     CommonProxyErrors,
     KeyManagementRoutes,
     LiteLLM_UserTable,
@@ -32,6 +33,8 @@ _PROXY_ADMIN_VIEW_ONLY_BLOCKED_ROUTES: Final = frozenset(
         "/user/delete",
         "/management/v1/users/bulk_delete",
         "/user/bulk_update",
+        "/customer/bulk_update",
+        "/end_user/bulk_update",
         # team
         "/team/new",
         "/management/v1/teams/{team_id}/members/bulk_delete",
@@ -503,6 +506,13 @@ class RouteChecks:
         return route in LiteLLMRoutes.info_routes.value
 
     @staticmethod
+    def is_dashboard_session_info_route(route: str, team_id: str | None) -> bool:
+        """
+        Check if an Admin UI session key is calling an info route the dashboard polls in the background
+        """
+        return team_id == UI_TEAM_ID and RouteChecks.is_info_route(route)
+
+    @staticmethod
     def _is_azure_openai_route(route: str) -> bool:
         """
         Check if route is a route from AzureOpenAI SDK client
@@ -915,6 +925,8 @@ class RouteChecks:
             "/user/delete",
             "/management/v1/users/bulk_delete",
             "/user/bulk_update",
+            "/customer/bulk_update",
+            "/end_user/bulk_update",
             "/team/new",
             "/management/v1/teams/{team_id}/members/bulk_delete",
             "/management/v1/teams/{team_id}/members/bulk_update",

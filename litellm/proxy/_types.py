@@ -32,6 +32,7 @@ from litellm.constants import DEFAULT_STAGGER_WINDOW_SECONDS, MCP_STDIO_ALLOWED_
 from litellm.litellm_core_utils.initialize_dynamic_callback_params import (
     validate_arize_otlp_protocol_value,
     validate_capture_message_content_value,
+    validate_excluded_services_value,
     validate_langfuse_environment_value,
     validate_langfuse_span_scope_value,
     validate_no_callback_env_reference,
@@ -90,6 +91,7 @@ from litellm.types.router_weights import validate_router_settings_dict
 from litellm.types.secret_managers.main import KeyManagementSystem
 from litellm.types.utils import (
     CAPTURE_MESSAGE_CONTENT_VAR,
+    EXCLUDED_SERVICES_VAR,
     AzureSpillover,
     CallTypes,
     CostBreakdown,
@@ -1834,6 +1836,14 @@ class UpdateCustomerRequest(LiteLLMPydanticObjectBase):
     object_permission: LiteLLM_ObjectPermissionBase | None = None
 
 
+class BulkUpdateCustomerRequest(LiteLLMPydanticObjectBase):
+    model_config = ConfigDict(frozen=True)
+
+    customers: tuple[UpdateCustomerRequest, ...] = Field(
+        min_length=1, max_length=500, description="Customer updates processed independently in request order"
+    )
+
+
 class DeleteCustomerRequest(LiteLLMPydanticObjectBase):
     """
     Delete multiple Customers
@@ -2046,10 +2056,16 @@ class AddTeamCallback(LiteLLMPydanticObjectBase):
     @classmethod
     def validate_callback_vars(cls, values):
         callback_vars: Final = values.get("callback_vars", {})
-        valid_keys: Final = {*StandardCallbackDynamicParams.__annotations__, CAPTURE_MESSAGE_CONTENT_VAR}
+        valid_keys: Final = {
+            *StandardCallbackDynamicParams.__annotations__,
+            CAPTURE_MESSAGE_CONTENT_VAR,
+            EXCLUDED_SERVICES_VAR,
+        }
         for key, value in callback_vars.items():
             if key not in valid_keys:
                 raise ValueError(f"Invalid callback variable: {key}. Must be one of {valid_keys}")
+            if key in (CAPTURE_MESSAGE_CONTENT_VAR, EXCLUDED_SERVICES_VAR) and not isinstance(value, str):
+                raise ValueError(f"{key} must be a string, got {type(value).__name__}")
             callback_vars[key] = str(value)
             validate_no_callback_env_reference(key, callback_vars[key], source="key/team callback metadata")
             if key == "langfuse_environment":
@@ -2060,6 +2076,8 @@ class AddTeamCallback(LiteLLMPydanticObjectBase):
                 validate_arize_otlp_protocol_value(callback_vars[key])
             if key == CAPTURE_MESSAGE_CONTENT_VAR:
                 validate_capture_message_content_value(callback_vars[key])
+            if key == EXCLUDED_SERVICES_VAR:
+                validate_excluded_services_value(callback_vars[key])
         return values
 
 
