@@ -1,0 +1,122 @@
+{
+  "method": "POST",
+  "url": "http://localhost:4000/customer/update",
+  "before": {
+    "user_id": "qa-final-retry-a",
+    "alias": "qa-final-retry-a",
+    "budget_id": "7e62c9bf-5b59-44c9-8d8b-73632a97ed8f",
+    "allowed_model_region": null,
+    "object_permission": {
+      "object_permission_id": "9026ee75-5dd3-49be-934b-65366a7f450a",
+      "mcp_servers": [
+        "qa-final-a"
+      ],
+      "mcp_access_groups": [],
+      "mcp_tool_permissions": {
+        "qa-final-a": [
+          "read_example",
+          "write_example"
+        ]
+      },
+      "vector_stores": [],
+      "agents": [],
+      "agent_access_groups": [],
+      "models": [],
+      "mcp_toolsets": [
+        "bdaf2afe-8988-47b0-81c4-279a2c3a7317"
+      ],
+      "blocked_tools": [],
+      "search_tools": [],
+      "mcp_tool_search_enabled": null,
+      "skills": []
+    },
+    "max_budget": 25.0
+  },
+  "request": {
+    "user_id": "qa-final-retry-a",
+    "max_budget": 40
+  },
+  "status": 200,
+  "response": {
+    "user_id": "qa-final-retry-a",
+    "blocked": false,
+    "alias": "qa-final-retry-a",
+    "spend": 0.0,
+    "allowed_model_region": null,
+    "default_model": null,
+    "models": [],
+    "budget_id": "7e62c9bf-5b59-44c9-8d8b-73632a97ed8f",
+    "litellm_budget_table": {
+      "budget_id": "7e62c9bf-5b59-44c9-8d8b-73632a97ed8f",
+      "soft_budget": null,
+      "max_budget": 40.0,
+      "max_parallel_requests": null,
+      "tpm_limit": null,
+      "rpm_limit": null,
+      "tpd_limit": null,
+      "model_max_budget": null,
+      "budget_duration": null,
+      "allowed_models": [],
+      "temp_budget_increase": null,
+      "temp_budget_expiry": null,
+      "budget_reset_at": null,
+      "created_at": "2026-10-18T01:13:02.301000Z"
+    },
+    "object_permission_id": "9026ee75-5dd3-49be-934b-65366a7f450a",
+    "object_permission": {
+      "object_permission_id": "9026ee75-5dd3-49be-934b-65366a7f450a",
+      "mcp_servers": [
+        "qa-final-a"
+      ],
+      "mcp_access_groups": [],
+      "mcp_tool_permissions": {
+        "qa-final-a": [
+          "read_example",
+          "write_example"
+        ]
+      },
+      "vector_stores": [],
+      "agents": [],
+      "agent_access_groups": [],
+      "models": [],
+      "mcp_toolsets": [
+        "bdaf2afe-8988-47b0-81c4-279a2c3a7317"
+      ],
+      "blocked_tools": [],
+      "search_tools": [],
+      "mcp_tool_search_enabled": null,
+      "skills": []
+    }
+  },
+  "after": {
+    "user_id": "qa-final-retry-a",
+    "alias": "qa-final-retry-a",
+    "budget_id": "7e62c9bf-5b59-44c9-8d8b-73632a97ed8f",
+    "allowed_model_region": null,
+    "object_permission": {
+      "object_permission_id": "9026ee75-5dd3-49be-934b-65366a7f450a",
+      "mcp_servers": [
+        "qa-final-a"
+      ],
+      "mcp_access_groups": [],
+      "mcp_tool_permissions": {
+        "qa-final-a": [
+          "read_example",
+          "write_example"
+        ]
+      },
+      "vector_stores": [],
+      "agents": [],
+      "agent_access_groups": [],
+      "models": [],
+      "mcp_toolsets": [
+        "bdaf2afe-8988-47b0-81c4-279a2c3a7317"
+      ],
+      "blocked_tools": [],
+      "search_tools": [],
+      "mcp_tool_search_enabled": null,
+      "skills": []
+    },
+    "max_budget": 40.0
+  }
+}

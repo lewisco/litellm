@@ -1,0 +1,51 @@
+{
+  "team_request": {
+    "team_id": "qa-final-team",
+    "team_alias": "qa-final-team",
+    "models": [
+      "*"
+    ],
+    "object_permission": {
+      "mcp_servers": [
+        "qa-final-a",
+        "qa-final-b"
+      ],
+      "mcp_access_groups": [],
+      "mcp_toolsets": [],
+      "mcp_tool_permissions": {
+        "qa-final-a": [
+          "read_example"
+        ],
+        "qa-final-b": []
+      }
+    }
+  },
+  "team_status": 200,
+  "organization_request": {
+    "organization_id": "qa-final-org",
+    "organization_alias": "qa-final-org",
+    "models": [
+      "*"
+    ],
+    "object_permission": {
+      "mcp_servers": [
+        "qa-final-a",
+        "qa-final-b"
+      ],
+      "mcp_access_groups": [],
+      "mcp_toolsets": [],
+      "mcp_tool_permissions": {
+        "qa-final-a": [
+          "read_example"
+        ],
+        "qa-final-b": []
+      }
+    }
+  },
+  "organization_status": 403,
+  "organization_response": {
+    "detail": {
+      "error": "Organizations are only available for LiteLLM Enterprise users. You must be a LiteLLM Enterprise user to use this feature. If you have a license please set `LITELLM_LICENSE` in your env. Get a 7 day trial key here: https://www.litellm.ai/enterprise#trial. \nPricing: https://www.litellm.ai/#pricing"
+    }
+  }
+}

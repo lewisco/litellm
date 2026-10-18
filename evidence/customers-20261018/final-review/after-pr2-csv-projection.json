@@ -1,0 +1,50 @@
+{
+  "source_download": "after-pr2-customers-limited.csv",
+  "rows": 10,
+  "core_rows": [
+    {
+      "Customer Alias": "qa-final-core-a-after-pr2",
+      "Customer ID": "qa-final-core-a",
+      "Status": "Active",
+      "Spend (USD)": "0",
+      "Budget ID": "0283ec65-44e9-4fa2-a94f-c4b03e85f787",
+      "Max Budget (USD)": "25",
+      "Soft Budget (USD)": "",
+      "Budget Duration": "",
+      "Budget Reset At": "",
+      "TPM Limit": "",
+      "RPM Limit": "",
+      "TPD Limit": "",
+      "Max Parallel Requests": "",
+      "Models": "",
+      "MCP Servers": "qa-final-a",
+      "MCP Access Groups": "",
+      "MCP Toolsets": "",
+      "MCP Tool Permissions": "{\"qa-final-a\":[\"read_example\"],\"qa-final-b\":[\"read_example\"]}",
+      "Allowed Model Region": "",
+      "Default Model": ""
+    },
+    {
+      "Customer Alias": "qa-final-core-b",
+      "Customer ID": "qa-final-core-b",
+      "Status": "Active",
+      "Spend (USD)": "0",
+      "Budget ID": "84de1b27-1f92-47db-9d8c-dd77a0fd9425",
+      "Max Budget (USD)": "25",
+      "Soft Budget (USD)": "",
+      "Budget Duration": "",
+      "Budget Reset At": "",
+      "TPM Limit": "",
+      "RPM Limit": "",
+      "TPD Limit": "",
+      "Max Parallel Requests": "",
+      "Models": "",
+      "MCP Servers": "qa-final-a",
+      "MCP Access Groups": "",
+      "MCP Toolsets": "",
+      "MCP Tool Permissions": "{\"qa-final-a\":[\"read_example\"],\"qa-final-b\":[\"read_example\"]}",
+      "Allowed Model Region": "",
+      "Default Model": ""
+    }
+  ]
+}

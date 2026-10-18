@@ -1,0 +1,570 @@
+[
+  {
+    "case": "owned budget maximum 35",
+    "method": "POST",
+    "url": "http://localhost:4000/customer/bulk_update",
+    "before": {
+      "user_id": "qa-final-owned-budget",
+      "alias": "qa-final-owned-budget",
+      "budget_id": "60399bb2-788e-4170-aa3e-47cc6e4d7df8",
+      "allowed_model_region": null,
+      "object_permission": {
+        "object_permission_id": "7c2354cf-7625-448d-9cab-8543bf324908",
+        "mcp_servers": [
+          "qa-final-a"
+        ],
+        "mcp_access_groups": [],
+        "mcp_tool_permissions": {
+          "qa-final-a": [
+            "read_example"
+          ]
+        },
+        "vector_stores": [],
+        "agents": [],
+        "agent_access_groups": [],
+        "models": [],
+        "mcp_toolsets": [],
+        "blocked_tools": [],
+        "search_tools": [],
+        "mcp_tool_search_enabled": null,
+        "skills": []
+      },
+      "max_budget": 25.0
+    },
+    "request": {
+      "customers": [
+        {
+          "user_id": "qa-final-owned-budget",
+          "max_budget": 35
+        }
+      ]
+    },
+    "status": 200,
+    "response": {
+      "results": [
+        {
+          "user_id": "qa-final-owned-budget",
+          "success": true,
+          "updated_customer": {
+            "user_id": "qa-final-owned-budget",
+            "blocked": false,
+            "alias": "qa-final-owned-budget",
+            "spend": 0.0,
+            "allowed_model_region": null,
+            "default_model": null,
+            "models": [],
+            "budget_id": "60399bb2-788e-4170-aa3e-47cc6e4d7df8",
+            "litellm_budget_table": {
+              "budget_id": "60399bb2-788e-4170-aa3e-47cc6e4d7df8",
+              "soft_budget": null,
+              "max_budget": 35.0,
+              "max_parallel_requests": null,
+              "tpm_limit": null,
+              "rpm_limit": null,
+              "tpd_limit": null,
+              "model_max_budget": null,
+              "budget_duration": null,
+              "allowed_models": [],
+              "temp_budget_increase": null,
+              "temp_budget_expiry": null,
+              "budget_reset_at": null,
+              "created_at": "2026-10-18T01:26:20.510000Z"
+            },
+            "object_permission_id": "7c2354cf-7625-448d-9cab-8543bf324908",
+            "object_permission": {
+              "object_permission_id": "7c2354cf-7625-448d-9cab-8543bf324908",
+              "mcp_servers": [
+                "qa-final-a"
+              ],
+              "mcp_access_groups": [],
+              "mcp_tool_permissions": {
+                "qa-final-a": [
+                  "read_example"
+                ]
+              },
+              "vector_stores": [],
+              "agents": [],
+              "agent_access_groups": [],
+              "models": [],
+              "mcp_toolsets": [],
+              "blocked_tools": [],
+              "search_tools": [],
+              "mcp_tool_search_enabled": null,
+              "skills": []
+            }
+          },
+          "error": null
+        }
+      ],
+      "total_requested": 1,
+      "successful_updates": 1,
+      "failed_updates": 0
+    },
+    "after": {
+      "user_id": "qa-final-owned-budget",
+      "alias": "qa-final-owned-budget",
+      "budget_id": "60399bb2-788e-4170-aa3e-47cc6e4d7df8",
+      "allowed_model_region": null,
+      "object_permission": {
+        "object_permission_id": "7c2354cf-7625-448d-9cab-8543bf324908",
+        "mcp_servers": [
+          "qa-final-a"
+        ],
+        "mcp_access_groups": [],
+        "mcp_tool_permissions": {
+          "qa-final-a": [
+            "read_example"
+          ]
+        },
+        "vector_stores": [],
+        "agents": [],
+        "agent_access_groups": [],
+        "models": [],
+        "mcp_toolsets": [],
+        "blocked_tools": [],
+        "search_tools": [],
+        "mcp_tool_search_enabled": null,
+        "skills": []
+      },
+      "max_budget": 35.0
+    }
+  },
+  {
+    "case": "owned budget maximum 0",
+    "method": "POST",
+    "url": "http://localhost:4000/customer/bulk_update",
+    "before": {
+      "user_id": "qa-final-owned-budget",
+      "alias": "qa-final-owned-budget",
+      "budget_id": "60399bb2-788e-4170-aa3e-47cc6e4d7df8",
+      "allowed_model_region": null,
+      "object_permission": {
+        "object_permission_id": "7c2354cf-7625-448d-9cab-8543bf324908",
+        "mcp_servers": [
+          "qa-final-a"
+        ],
+        "mcp_access_groups": [],
+        "mcp_tool_permissions": {
+          "qa-final-a": [
+            "read_example"
+          ]
+        },
+        "vector_stores": [],
+        "agents": [],
+        "agent_access_groups": [],
+        "models": [],
+        "mcp_toolsets": [],
+        "blocked_tools": [],
+        "search_tools": [],
+        "mcp_tool_search_enabled": null,
+        "skills": []
+      },
+      "max_budget": 35.0
+    },
+    "request": {
+      "customers": [
+        {
+          "user_id": "qa-final-owned-budget",
+          "max_budget": 0
+        }
+      ]
+    },
+    "status": 200,
+    "response": {
+      "results": [
+        {
+          "user_id": "qa-final-owned-budget",
+          "success": true,
+          "updated_customer": {
+            "user_id": "qa-final-owned-budget",
+            "blocked": false,
+            "alias": "qa-final-owned-budget",
+            "spend": 0.0,
+            "allowed_model_region": null,
+            "default_model": null,
+            "models": [],
+            "budget_id": "60399bb2-788e-4170-aa3e-47cc6e4d7df8",
+            "litellm_budget_table": {
+              "budget_id": "60399bb2-788e-4170-aa3e-47cc6e4d7df8",
+              "soft_budget": null,
+              "max_budget": 0.0,
+              "max_parallel_requests": null,
+              "tpm_limit": null,
+              "rpm_limit": null,
+              "tpd_limit": null,
+              "model_max_budget": null,
+              "budget_duration": null,
+              "allowed_models": [],
+              "temp_budget_increase": null,
+              "temp_budget_expiry": null,
+              "budget_reset_at": null,
+              "created_at": "2026-10-18T01:26:20.510000Z"
+            },
+            "object_permission_id": "7c2354cf-7625-448d-9cab-8543bf324908",
+            "object_permission": {
+              "object_permission_id": "7c2354cf-7625-448d-9cab-8543bf324908",
+              "mcp_servers": [
+                "qa-final-a"
+              ],
+              "mcp_access_groups": [],
+              "mcp_tool_permissions": {
+                "qa-final-a": [
+                  "read_example"
+                ]
+              },
+              "vector_stores": [],
+              "agents": [],
+              "agent_access_groups": [],
+              "models": [],
+              "mcp_toolsets": [],
+              "blocked_tools": [],
+              "search_tools": [],
+              "mcp_tool_search_enabled": null,
+              "skills": []
+            }
+          },
+          "error": null
+        }
+      ],
+      "total_requested": 1,
+      "successful_updates": 1,
+      "failed_updates": 0
+    },
+    "after": {
+      "user_id": "qa-final-owned-budget",
+      "alias": "qa-final-owned-budget",
+      "budget_id": "60399bb2-788e-4170-aa3e-47cc6e4d7df8",
+      "allowed_model_region": null,
+      "object_permission": {
+        "object_permission_id": "7c2354cf-7625-448d-9cab-8543bf324908",
+        "mcp_servers": [
+          "qa-final-a"
+        ],
+        "mcp_access_groups": [],
+        "mcp_tool_permissions": {
+          "qa-final-a": [
+            "read_example"
+          ]
+        },
+        "vector_stores": [],
+        "agents": [],
+        "agent_access_groups": [],
+        "models": [],
+        "mcp_toolsets": [],
+        "blocked_tools": [],
+        "search_tools": [],
+        "mcp_tool_search_enabled": null,
+        "skills": []
+      },
+      "max_budget": 0.0
+    }
+  },
+  {
+    "case": "budget_id and max_budget conflict values",
+    "method": "POST",
+    "url": "http://localhost:4000/customer/bulk_update",
+    "before": {
+      "qa-final-owned-budget": {
+        "user_id": "qa-final-owned-budget",
+        "alias": "qa-final-owned-budget",
+        "budget_id": "60399bb2-788e-4170-aa3e-47cc6e4d7df8",
+        "allowed_model_region": null,
+        "object_permission": {
+          "object_permission_id": "7c2354cf-7625-448d-9cab-8543bf324908",
+          "mcp_servers": [
+            "qa-final-a"
+          ],
+          "mcp_access_groups": [],
+          "mcp_tool_permissions": {
+            "qa-final-a": [
+              "read_example"
+            ]
+          },
+          "vector_stores": [],
+          "agents": [],
+          "agent_access_groups": [],
+          "models": [],
+          "mcp_toolsets": [],
+          "blocked_tools": [],
+          "search_tools": [],
+          "mcp_tool_search_enabled": null,
+          "skills": []
+        },
+        "max_budget": 0.0
+      },
+      "qa-final-retry-b": {
+        "user_id": "qa-final-retry-b",
+        "alias": "qa-final-retry-b",
+        "budget_id": "9ab1342b-502f-40a4-9929-d3f42ad9b2bb",
+        "allowed_model_region": "eu",
+        "object_permission": {
+          "object_permission_id": "de927149-2f15-4931-a6ea-1af17f815ac6",
+          "mcp_servers": [
+            "qa-final-a"
+          ],
+          "mcp_access_groups": [],
+          "mcp_tool_permissions": {
+            "qa-final-a": [
+              "read_example",
+              "write_example"
+            ]
+          },
+          "vector_stores": [],
+          "agents": [],
+          "agent_access_groups": [],
+          "models": [],
+          "mcp_toolsets": [
+            "bdaf2afe-8988-47b0-81c4-279a2c3a7317"
+          ],
+          "blocked_tools": [],
+          "search_tools": [],
+          "mcp_tool_search_enabled": null,
+          "skills": []
+        },
+        "max_budget": 30.0
+      }
+    },
+    "request": {
+      "customers": [
+        {
+          "user_id": "qa-final-owned-budget",
+          "alias": "should-not-write"
+        },
+        {
+          "user_id": "qa-final-retry-b",
+          "budget_id": "60399bb2-788e-4170-aa3e-47cc6e4d7df8",
+          "max_budget": 10
+        }
+      ]
+    },
+    "status": 422,
+    "response": {
+      "detail": [
+        {
+          "type": "value_error",
+          "loc": [
+            "body",
+            "customers",
+            1
+          ],
+          "msg": "Value error, Set either 'max_budget' or 'budget_id', not both."
+        }
+      ]
+    },
+    "after": {
+      "qa-final-owned-budget": {
+        "user_id": "qa-final-owned-budget",
+        "alias": "qa-final-owned-budget",
+        "budget_id": "60399bb2-788e-4170-aa3e-47cc6e4d7df8",
+        "allowed_model_region": null,
+        "object_permission": {
+          "object_permission_id": "7c2354cf-7625-448d-9cab-8543bf324908",
+          "mcp_servers": [
+            "qa-final-a"
+          ],
+          "mcp_access_groups": [],
+          "mcp_tool_permissions": {
+            "qa-final-a": [
+              "read_example"
+            ]
+          },
+          "vector_stores": [],
+          "agents": [],
+          "agent_access_groups": [],
+          "models": [],
+          "mcp_toolsets": [],
+          "blocked_tools": [],
+          "search_tools": [],
+          "mcp_tool_search_enabled": null,
+          "skills": []
+        },
+        "max_budget": 0.0
+      },
+      "qa-final-retry-b": {
+        "user_id": "qa-final-retry-b",
+        "alias": "qa-final-retry-b",
+        "budget_id": "9ab1342b-502f-40a4-9929-d3f42ad9b2bb",
+        "allowed_model_region": "eu",
+        "object_permission": {
+          "object_permission_id": "de927149-2f15-4931-a6ea-1af17f815ac6",
+          "mcp_servers": [
+            "qa-final-a"
+          ],
+          "mcp_access_groups": [],
+          "mcp_tool_permissions": {
+            "qa-final-a": [
+              "read_example",
+              "write_example"
+            ]
+          },
+          "vector_stores": [],
+          "agents": [],
+          "agent_access_groups": [],
+          "models": [],
+          "mcp_toolsets": [
+            "bdaf2afe-8988-47b0-81c4-279a2c3a7317"
+          ],
+          "blocked_tools": [],
+          "search_tools": [],
+          "mcp_tool_search_enabled": null,
+          "skills": []
+        },
+        "max_budget": 30.0
+      }
+    }
+  },
+  {
+    "case": "budget_id and max_budget conflict nulls",
+    "method": "POST",
+    "url": "http://localhost:4000/customer/bulk_update",
+    "before": {
+      "qa-final-owned-budget": {
+        "user_id": "qa-final-owned-budget",
+        "alias": "qa-final-owned-budget",
+        "budget_id": "60399bb2-788e-4170-aa3e-47cc6e4d7df8",
+        "allowed_model_region": null,
+        "object_permission": {
+          "object_permission_id": "7c2354cf-7625-448d-9cab-8543bf324908",
+          "mcp_servers": [
+            "qa-final-a"
+          ],
+          "mcp_access_groups": [],
+          "mcp_tool_permissions": {
+            "qa-final-a": [
+              "read_example"
+            ]
+          },
+          "vector_stores": [],
+          "agents": [],
+          "agent_access_groups": [],
+          "models": [],
+          "mcp_toolsets": [],
+          "blocked_tools": [],
+          "search_tools": [],
+          "mcp_tool_search_enabled": null,
+          "skills": []
+        },
+        "max_budget": 0.0
+      },
+      "qa-final-retry-b": {
+        "user_id": "qa-final-retry-b",
+        "alias": "qa-final-retry-b",
+        "budget_id": "9ab1342b-502f-40a4-9929-d3f42ad9b2bb",
+        "allowed_model_region": "eu",
+        "object_permission": {
+          "object_permission_id": "de927149-2f15-4931-a6ea-1af17f815ac6",
+          "mcp_servers": [
+            "qa-final-a"
+          ],
+          "mcp_access_groups": [],
+          "mcp_tool_permissions": {
+            "qa-final-a": [
+              "read_example",
+              "write_example"
+            ]
+          },
+          "vector_stores": [],
+          "agents": [],
+          "agent_access_groups": [],
+          "models": [],
+          "mcp_toolsets": [
+            "bdaf2afe-8988-47b0-81c4-279a2c3a7317"
+          ],
+          "blocked_tools": [],
+          "search_tools": [],
+          "mcp_tool_search_enabled": null,
+          "skills": []
+        },
+        "max_budget": 30.0
+      }
+    },
+    "request": {
+      "customers": [
+        {
+          "user_id": "qa-final-owned-budget",
+          "alias": "should-not-write"
+        },
+        {
+          "user_id": "qa-final-retry-b",
+          "budget_id": null,
+          "max_budget": null
+        }
+      ]
+    },
+    "status": 422,
+    "response": {
+      "detail": [
+        {
+          "type": "value_error",
+          "loc": [
+            "body",
+            "customers",
+            1
+          ],
+          "msg": "Value error, Set either 'max_budget' or 'budget_id', not both."
+        }
+      ]
+    },
+    "after": {
+      "qa-final-owned-budget": {
+        "user_id": "qa-final-owned-budget",
+        "alias": "qa-final-owned-budget",
+        "budget_id": "60399bb2-788e-4170-aa3e-47cc6e4d7df8",
+        "allowed_model_region": null,
+        "object_permission": {
+          "object_permission_id": "7c2354cf-7625-448d-9cab-8543bf324908",
+          "mcp_servers": [
+            "qa-final-a"
+          ],
+          "mcp_access_groups": [],
+          "mcp_tool_permissions": {
+            "qa-final-a": [
+              "read_example"
+            ]
+          },
+          "vector_stores": [],
+          "agents": [],
+          "agent_access_groups": [],
+          "models": [],
+          "mcp_toolsets": [],
+          "blocked_tools": [],
+          "search_tools": [],
+          "mcp_tool_search_enabled": null,
+          "skills": []
+        },
+        "max_budget": 0.0
+      },
+      "qa-final-retry-b": {
+        "user_id": "qa-final-retry-b",
+        "alias": "qa-final-retry-b",
+        "budget_id": "9ab1342b-502f-40a4-9929-d3f42ad9b2bb",
+        "allowed_model_region": "eu",
+        "object_permission": {
+          "object_permission_id": "de927149-2f15-4931-a6ea-1af17f815ac6",
+          "mcp_servers": [
+            "qa-final-a"
+          ],
+          "mcp_access_groups": [],
+          "mcp_tool_permissions": {
+            "qa-final-a": [
+              "read_example",
+              "write_example"
+            ]
+          },
+          "vector_stores": [],
+          "agents": [],
+          "agent_access_groups": [],
+          "models": [],
+          "mcp_toolsets": [
+            "bdaf2afe-8988-47b0-81c4-279a2c3a7317"
+          ],
+          "blocked_tools": [],
+          "search_tools": [],
+          "mcp_tool_search_enabled": null,
+          "skills": []
+        },
+        "max_budget": 30.0
+      }
+    }
+  }
+]

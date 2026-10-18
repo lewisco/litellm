@@ -1,0 +1,17 @@
+{
+  "url": "http://localhost:4000/ui/customers/",
+  "status": 404,
+  "visible_text": "404\nThis page could not be found.",
+  "neighbors": [
+    {
+      "route": "api-keys",
+      "headings": [
+        "Virtual Keys"
+      ]
+    },
+    {
+      "route": "users",
+      "headings": []
+    }
+  ]
+}

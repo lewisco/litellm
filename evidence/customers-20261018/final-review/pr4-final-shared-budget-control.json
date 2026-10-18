@@ -1,0 +1,79 @@
+{
+  "method": "POST",
+  "url": "http://localhost:4000/customer/update",
+  "before": {
+    "user_id": "qa-final-retry-a",
+    "alias": "qa-final-retry-a",
+    "budget_id": "7e62c9bf-5b59-44c9-8d8b-73632a97ed8f",
+    "allowed_model_region": null,
+    "object_permission": {
+      "object_permission_id": "9026ee75-5dd3-49be-934b-65366a7f450a",
+      "mcp_servers": [
+        "qa-final-a"
+      ],
+      "mcp_access_groups": [],
+      "mcp_tool_permissions": {
+        "qa-final-a": [
+          "read_example",
+          "write_example"
+        ]
+      },
+      "vector_stores": [],
+      "agents": [],
+      "agent_access_groups": [],
+      "models": [],
+      "mcp_toolsets": [
+        "bdaf2afe-8988-47b0-81c4-279a2c3a7317"
+      ],
+      "blocked_tools": [],
+      "search_tools": [],
+      "mcp_tool_search_enabled": null,
+      "skills": []
+    },
+    "max_budget": 25.0
+  },
+  "request": {
+    "user_id": "qa-final-retry-a",
+    "max_budget": 40
+  },
+  "status": 400,
+  "response": {
+    "error": {
+      "message": "Cannot update max_budget for a shared budget. Update the budget directly or assign a different budget.",
+      "type": "bad_request",
+      "param": "max_budget",
+      "code": "400"
+    }
+  },
+  "after": {
+    "user_id": "qa-final-retry-a",
+    "alias": "qa-final-retry-a",
+    "budget_id": "7e62c9bf-5b59-44c9-8d8b-73632a97ed8f",
+    "allowed_model_region": null,
+    "object_permission": {
+      "object_permission_id": "9026ee75-5dd3-49be-934b-65366a7f450a",
+      "mcp_servers": [
+        "qa-final-a"
+      ],
+      "mcp_access_groups": [],
+      "mcp_tool_permissions": {
+        "qa-final-a": [
+          "read_example",
+          "write_example"
+        ]
+      },
+      "vector_stores": [],
+      "agents": [],
+      "agent_access_groups": [],
+      "models": [],
+      "mcp_toolsets": [
+        "bdaf2afe-8988-47b0-81c4-279a2c3a7317"
+      ],
+      "blocked_tools": [],
+      "search_tools": [],
+      "mcp_tool_search_enabled": null,
+      "skills": []
+    },
+    "max_budget": 25.0
+  }
+}

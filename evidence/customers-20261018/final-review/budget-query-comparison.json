@@ -1,0 +1,20 @@
+[
+  {
+    "variant": "before",
+    "synthetic_keys": 500000,
+    "guard_queries": 500,
+    "sum_ms": 12054.659,
+    "median_ms": 23.642000000000003,
+    "min_ms": 16.582,
+    "max_ms": 45.174
+  },
+  {
+    "variant": "after",
+    "synthetic_keys": 500000,
+    "guard_queries": 500,
+    "sum_ms": 573.132,
+    "median_ms": 0.958,
+    "min_ms": 0.214,
+    "max_ms": 6.083
+  }
+]

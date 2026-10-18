@@ -1,0 +1,83 @@
+{
+  "method": "POST",
+  "url": "http://localhost:4000/customer/update",
+  "before": {
+    "user_id": "qa-final-direct",
+    "alias": "qa-final-direct",
+    "budget_id": "82490069-3eca-424f-a741-20b6e8ebe306",
+    "allowed_model_region": null,
+    "object_permission": {
+      "object_permission_id": "0e359f5e-0cc6-40af-b779-06e6d57b5508",
+      "mcp_servers": [
+        "qa-final-a"
+      ],
+      "mcp_access_groups": [],
+      "mcp_tool_permissions": {
+        "qa-final-a": [
+          "read_example"
+        ]
+      },
+      "vector_stores": [
+        "qa-final-vector"
+      ],
+      "agents": [],
+      "agent_access_groups": [],
+      "models": [],
+      "mcp_toolsets": [
+        "dd508968-029a-4f96-a433-4471dec03cae"
+      ],
+      "blocked_tools": [],
+      "search_tools": [],
+      "mcp_tool_search_enabled": null,
+      "skills": []
+    }
+  },
+  "request": {
+    "user_id": "qa-final-direct",
+    "object_permission": {
+      "mcp_toolsets": [
+        "bdaf2afe-8988-47b0-81c4-279a2c3a7317"
+      ]
+    }
+  },
+  "status": 500,
+  "response": {
+    "error": {
+      "message": "Unable to match input value to any allowed input type for the field. Parse errors: [Unable to match input value to any allowed input type for the field. Parse errors: [`create.mcp_servers`: A value is required but not set, `create.mcp_servers`: A value is required but not set], Unable to match input value to any allowed input type for the field. Parse errors: [`create.mcp_servers`: A value is required but not set, `create.mcp_servers`: A value is required but not set]]",
+      "type": "internal_server_error",
+      "param": null,
+      "code": "500"
+    }
+  },
+  "after": {
+    "user_id": "qa-final-direct",
+    "alias": "qa-final-direct",
+    "budget_id": "82490069-3eca-424f-a741-20b6e8ebe306",
+    "allowed_model_region": null,
+    "object_permission": {
+      "object_permission_id": "0e359f5e-0cc6-40af-b779-06e6d57b5508",
+      "mcp_servers": [
+        "qa-final-a"
+      ],
+      "mcp_access_groups": [],
+      "mcp_tool_permissions": {
+        "qa-final-a": [
+          "read_example"
+        ]
+      },
+      "vector_stores": [
+        "qa-final-vector"
+      ],
+      "agents": [],
+      "agent_access_groups": [],
+      "models": [],
+      "mcp_toolsets": [
+        "dd508968-029a-4f96-a433-4471dec03cae"
+      ],
+      "blocked_tools": [],
+      "search_tools": [],
+      "mcp_tool_search_enabled": null,
+      "skills": []
+    }
+  }
+}

@@ -1,0 +1,49 @@
+[
+  {
+    "method": "POST",
+    "url": "http://localhost:4000/mcp-rest/tools/call",
+    "authorization": "Generated virtual key",
+    "customer_id": "qa-final-retry-a",
+    "request": {
+      "server_id": "qa-final-a",
+      "name": "read_example",
+      "arguments": {}
+    },
+    "status": 200,
+    "response": {
+      "_meta": null,
+      "content": [
+        {
+          "type": "text",
+          "text": "Synthetic example data",
+          "annotations": null,
+          "_meta": null
+        }
+      ],
+      "structuredContent": {
+        "result": "Synthetic example data"
+      },
+      "isError": false,
+      "resultType": "complete"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://localhost:4000/mcp-rest/tools/call",
+    "authorization": "Generated virtual key",
+    "customer_id": "qa-final-retry-a",
+    "request": {
+      "server_id": "qa-final-a",
+      "name": "write_example",
+      "arguments": {
+        "value": "proof"
+      }
+    },
+    "status": 403,
+    "response": {
+      "detail": {
+        "error": "Tool 'write_example' is not allowed for your key/team on server 'qa_final_a'. Contact proxy admin for access."
+      }
+    }
+  }
+]

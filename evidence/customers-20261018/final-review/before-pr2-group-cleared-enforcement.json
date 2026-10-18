@@ -1,0 +1,60 @@
+[
+  {
+    "method": "POST",
+    "url": "http://localhost:4000/mcp-rest/tools/call",
+    "authorization": "Generated virtual key",
+    "customer_id": "qa-final-group",
+    "request": {
+      "server_id": "qa-final-a",
+      "name": "read_example",
+      "arguments": {}
+    },
+    "status": 200,
+    "response": {
+      "_meta": null,
+      "content": [
+        {
+          "type": "text",
+          "text": "Synthetic example data",
+          "annotations": null,
+          "_meta": null
+        }
+      ],
+      "structuredContent": {
+        "result": "Synthetic example data"
+      },
+      "isError": false,
+      "resultType": "complete"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://localhost:4000/mcp-rest/tools/call",
+    "authorization": "Generated virtual key",
+    "customer_id": "qa-final-group",
+    "request": {
+      "server_id": "qa-final-a",
+      "name": "write_example",
+      "arguments": {
+        "value": "proof"
+      }
+    },
+    "status": 200,
+    "response": {
+      "_meta": null,
+      "content": [
+        {
+          "type": "text",
+          "text": "Synthetic value received",
+          "annotations": null,
+          "_meta": null
+        }
+      ],
+      "structuredContent": {
+        "result": "Synthetic value received"
+      },
+      "isError": false,
+      "resultType": "complete"
+    }
+  }
+]

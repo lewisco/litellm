@@ -1,0 +1,198 @@
+{
+  "phase": "neighbor-base",
+  "before": {
+    "team_id": "qa-final-team",
+    "team_alias": "qa-final-team-neighbor-base-saved",
+    "models": [
+      "*"
+    ],
+    "object_permission": {
+      "object_permission_id": "86242ac7-2165-4a98-8302-854728443bd1",
+      "mcp_servers": [
+        "qa-final-a",
+        "qa-final-b"
+      ],
+      "mcp_access_groups": [],
+      "mcp_tool_permissions": {
+        "qa-final-a": [
+          "read_example"
+        ],
+        "qa-final-b": []
+      },
+      "vector_stores": [],
+      "agents": [],
+      "agent_access_groups": [],
+      "models": [],
+      "mcp_toolsets": [],
+      "blocked_tools": [],
+      "search_tools": [],
+      "mcp_tool_search_enabled": null,
+      "skills": []
+    }
+  },
+  "posts": [
+    {
+      "url": "http://localhost:4000/team/update",
+      "status": 200,
+      "request": {
+        "team_id": "qa-final-team",
+        "team_alias": "qa-final-team-neighbor-base-proof",
+        "models": [
+          "*"
+        ],
+        "tpm_limit": null,
+        "rpm_limit": null,
+        "tpd_limit": null,
+        "model_tpm_limit": {},
+        "model_rpm_limit": {},
+        "max_budget": null,
+        "soft_budget": null,
+        "budget_duration": null,
+        "metadata": {
+          "allowed_passthrough_routes": [],
+          "guardrails": [],
+          "opted_out_global_guardrails": [],
+          "disable_global_guardrails": false,
+          "soft_budget_alerting_emails": []
+        },
+        "object_permission": {
+          "mcp_servers": [
+            "qa-final-a",
+            "qa-final-b"
+          ],
+          "mcp_access_groups": [],
+          "mcp_tool_permissions": {
+            "qa-final-a": [
+              "read_example"
+            ],
+            "qa-final-b": []
+          },
+          "mcp_toolsets": [],
+          "agents": [],
+          "agent_access_groups": [],
+          "vector_stores": [],
+          "skills": []
+        },
+        "access_group_ids": []
+      },
+      "response": {
+        "team_id": "qa-final-team",
+        "data": {
+          "team_id": "qa-final-team",
+          "team_alias": "qa-final-team-neighbor-base-proof",
+          "organization_id": null,
+          "object_permission_id": "86242ac7-2165-4a98-8302-854728443bd1",
+          "admins": [],
+          "members": [],
+          "members_with_roles": [
+            {
+              "role": "admin",
+              "user_id": "default_user_id",
+              "user_email": null
+            }
+          ],
+          "metadata": {
+            "guardrails": [],
+            "model_rpm_limit": {},
+            "model_tpm_limit": {},
+            "disable_global_guardrails": false,
+            "allowed_passthrough_routes": [],
+            "opted_out_global_guardrails": [],
+            "soft_budget_alerting_emails": []
+          },
+          "max_budget": null,
+          "soft_budget": null,
+          "spend": 0,
+          "models": [
+            "*"
+          ],
+          "max_parallel_requests": null,
+          "tpm_limit": null,
+          "rpm_limit": null,
+          "tpd_limit": null,
+          "budget_duration": null,
+          "budget_reset_at": null,
+          "blocked": false,
+          "created_at": "2026-10-18T01:38:26.774000Z",
+          "updated_at": "2026-10-18T01:39:43.536000Z",
+          "model_spend": {},
+          "model_max_budget": {},
+          "router_settings": {},
+          "team_member_permissions": [],
+          "access_group_ids": [],
+          "policies": [],
+          "default_team_member_models": [],
+          "budget_limits": null,
+          "model_id": null,
+          "allow_team_guardrail_config": false,
+          "litellm_organization_table": null,
+          "litellm_model_table": null,
+          "object_permission": {
+            "object_permission_id": "86242ac7-2165-4a98-8302-854728443bd1",
+            "mcp_servers": [
+              "qa-final-a",
+              "qa-final-b"
+            ],
+            "mcp_access_groups": [],
+            "mcp_tool_permissions": {
+              "qa-final-a": [
+                "read_example"
+              ],
+              "qa-final-b": []
+            },
+            "vector_stores": [],
+            "agents": [],
+            "agent_access_groups": [],
+            "models": [],
+            "blocked_tools": [],
+            "mcp_toolsets": [],
+            "search_tools": [],
+            "mcp_tool_search_enabled": null,
+            "skills": [],
+            "teams": null,
+            "projects": null,
+            "verification_tokens": null,
+            "organizations": null,
+            "users": null,
+            "end_users": null,
+            "agents_table": null
+          },
+          "projects": null
+        }
+      }
+    }
+  ],
+  "after": {
+    "team_id": "qa-final-team",
+    "team_alias": "qa-final-team-neighbor-base-proof",
+    "models": [
+      "*"
+    ],
+    "object_permission": {
+      "object_permission_id": "86242ac7-2165-4a98-8302-854728443bd1",
+      "mcp_servers": [
+        "qa-final-a",
+        "qa-final-b"
+      ],
+      "mcp_access_groups": [],
+      "mcp_tool_permissions": {
+        "qa-final-a": [
+          "read_example"
+        ],
+        "qa-final-b": []
+      },
+      "vector_stores": [],
+      "agents": [],
+      "agent_access_groups": [],
+      "models": [],
+      "mcp_toolsets": [],
+      "blocked_tools": [],
+      "search_tools": [],
+      "mcp_tool_search_enabled": null,
+      "skills": []
+    }
+  },
+  "editor_text": "v1.107.0\nAI GATEWAY\nHome\nVirtual Keys\nPlayground\nModels + Endpoints\nAgentic\nMCP Servers\nSkills\nGuardrails\nPolicies\nTools\nOBSERVABILITY\nUsage\nModel Leaderboard\nBeta\nCost Optimization\nLogs\nLens\nBeta\nGuardrails Monitor\nACCESS CONTROL\nTeams\nInternal Users\nOrganizations\nAccess Groups\nBudgets\nDEVELOPER TOOLS\nAPI Reference\nAI Hub\nLearning Resources\nResponse Cache\nExperimental\nSETTINGS\nSettings\nDE\nAccount\nAdmin\nAI Gateway\nTeams\nSearch or jump to…\n⌘K\nDocs\nBlog\n1\nEnvironment-credential login is enabled\nReview\nBack to Teams\nqa-final-team-neighbor-base-saved\n\nqa-final-team\n\nOverview\nMy User\nVirtual Keys\nMembers\nMember Permissions\nSettings\nTeam Settings\nTeam Name\nModels\n*\n\nLeave empty to grant no models directly. The team keeps any models granted through its access groups\n\nModel Aliases\n\nAdd New Alias\n\nAlias Name\nTarget Model\nAdd Alias\n\nManage Existing Aliases\n\nAlias Name\tTarget Model\tActions\nNo aliases added yet. Add a new alias above.\nMax Budget (USD)\nSoft Budget (USD)\nSoft Budget Alerting Emails\nTeam Member Settings\nReset Budget\nNever resets\nPer-Model Budgets\nPremium feature - Upgrade to set per-model budgets\nAdd Model Budget\nTokens per minute Limit (TPM)\nRequests per minute Limit (RPM)\nTokens per day Limit (TPD)\nMetadata\nAdd Key-Value Pair\n\nValues are saved as text. Enter JSON for typed values, e.g. 3, true, or {\"region\": \"us\"}.\n\nModel-Specific Rate Limits\nAdd Model Limit\nEstimated Output Tokens\nEstimated Output Tokens Per Model\nRouter Settings\nLoadbalancing\nFallbacks\nRouting Settings\n\nConfigure how requests are routed to deployments\n\nROUTING STRATEGY\n\nRouting strategy to use for load balancing across deployments\n\nENABLE TAG FILTERING\n\nEnable tag-based routing to route requests based on tags Learn more\n\nReliability & Retries\n\nConfigure retry logic and failure handling\n\nGuardrails\nDisable all global guardrails\nRequire Trace ID\nPolicies\nAccess Groups\nVector Stores\nAllowed Pass Through Routes\nMCP Servers / Access Groups\nqa_final_a (qa-final-a)\nqa_final_b (qa-final-b)\n\nqa_final_a\n\nDisposable customer permission proof\n\nRisk Groups\nFlat List\nSelect All\nDeselect All\nOther\nUnclassified\n1/2 allowed\n\nPartial\n\nqa_final_b\n\nDisposable customer permission proof\n\nRisk Groups\nFlat List\nSelect All\nDeselect All\nOther\nUnclassified\n0/2 allowed\n\nAll off\n\nAgents / Access Groups\nSearch Tool Settings\nSkills\nOrganization\nLogging Settings\nDisabled Callbacks\nDisabled Callbacks\nSelect callbacks to disable\nSelect callbacks that should be disabled for this key. These callbacks will not receive any logging data.\nLogging Integrations\nAdd Integration\nNo logging integrations configured\nClick \"Add Integration\" to configure logging for this team\nSecret Manager Settings\n\nPremium feature - Upgrade to manage secret manager settings.\n\nCancel\nSave Changes\nPress\n⌘K\nto search or jump to a page",
+  "saved_text": "v1.107.0\nAI GATEWAY\nHome\nVirtual Keys\nPlayground\nModels + Endpoints\nAgentic\nMCP Servers\nSkills\nGuardrails\nPolicies\nTools\nOBSERVABILITY\nUsage\nModel Leaderboard\nBeta\nCost Optimization\nLogs\nLens\nBeta\nGuardrails Monitor\nACCESS CONTROL\nTeams\nInternal Users\nOrganizations\nAccess Groups\nBudgets\nDEVELOPER TOOLS\nAPI Reference\nAI Hub\nLearning Resources\nResponse Cache\nExperimental\nSETTINGS\nSettings\nDE\nAccount\nAdmin\nAI Gateway\nTeams\nSearch or jump to…\n⌘K\nDocs\nBlog\n1\nEnvironment-credential login is enabled\nReview\nBack to Teams\nqa-final-team-neighbor-base-proof\n\nqa-final-team\n\nOverview\nMy User\nVirtual Keys\nMembers\nMember Permissions\nSettings\n\nBudget Status\n\n$0.00\n\nof Unlimited\n\n\n\n\nRate Limits\n\nTPM: Unlimited\n\nRPM: Unlimited\n\nTPD (batch): Unlimited\n\nEstimated Output Tokens: Default\n\nEstimated Output Tokens Per Model: Default\n\nRequest Settings\n\nRequire Trace ID: Disabled\n\nModels\n\n*\n\nVirtual Keys\n\nUser Keys: 0\n\nService Account Keys: 0\n\nTotal: 0\n\nObject Permissions\n\nAccess control for Vector Stores and MCP Servers\n\nVector Stores\n\n0\n\nNo vector stores configured\n\nMCP Servers\n\n2\nqa_final_a (qa-...al-a)\n1\ntool\nqa_final_b (qa-...al-b)\n\nAllowed agents to call\n\n0\n\nNo agents or access groups configured\n\nSearch tools\n\nNo restriction — all configured search tools are allowed for this team.\n\nSkills\n\nNo private skills granted. Only enabled (public) Claude Code plugins are visible.\n\nGuardrails Settings\nNo guardrails configured\n\nPolicies\n\nNo policies configured\n\nLogging Settings\nActive logging integrations and disabled callbacks for this key\nLogging Integrations\n0\nNo logging integrations configured\nDisabled Callbacks\n0\nNo callbacks disabled\nPress\n⌘K\nto search or jump to a page\nTeam settings updated successfully",
+  "organization_text": "v1.107.0\nAI GATEWAY\nHome\nVirtual Keys\nPlayground\nModels + Endpoints\nAgentic\nMCP Servers\nSkills\nGuardrails\nPolicies\nTools\nOBSERVABILITY\nUsage\nModel Leaderboard\nBeta\nCost Optimization\nLogs\nLens\nBeta\nGuardrails Monitor\nACCESS CONTROL\nTeams\nInternal Users\nOrganizations\nAccess Groups\nBudgets\nDEVELOPER TOOLS\nAPI Reference\nAI Hub\nLearning Resources\nResponse Cache\nExperimental\nSETTINGS\nSettings\nDE\nAccount\nAdmin\nAI Gateway\nOrganizations\nSearch or jump to…\n⌘K\nDocs\nBlog\n1\nEnvironment-credential login is enabled\nReview\n\nThis is a LiteLLM Enterprise feature, and requires a valid key to use. Get a trial key here.\n\nPress\n⌘K\nto search or jump to a page"
+}

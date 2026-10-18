@@ -1,0 +1,26 @@
+[
+  {
+    "path": "litellm-proxy-extras/litellm_proxy_extras/migrations/20261018000100_customer_budget_reference_index/migration.sql",
+    "source_sha": "af2676b744809446375cf59b02ba61631a4b1b36",
+    "sql_sha256": "cb6713e012b61a3925a0d997599b697ba3c295a3b806db6154098b4b76f67594",
+    "exit_code": 0,
+    "stdout": "CREATE INDEX\n",
+    "stderr": ""
+  },
+  {
+    "path": "litellm-proxy-extras/litellm_proxy_extras/migrations/20261018000200_key_budget_reference_index/migration.sql",
+    "source_sha": "af2676b744809446375cf59b02ba61631a4b1b36",
+    "sql_sha256": "bd8c345c643617c86eb6139f01dc79875bad1c793aa6864310a5b5de21f47234",
+    "exit_code": 0,
+    "stdout": "CREATE INDEX\n",
+    "stderr": ""
+  },
+  {
+    "path": "litellm-proxy-extras/litellm_proxy_extras/migrations/20261018000300_key_customer_budget_reference_index/migration.sql",
+    "source_sha": "af2676b744809446375cf59b02ba61631a4b1b36",
+    "sql_sha256": "6cbeececfc0ac353acdb105e3a10e00f64f4f0d8418b97fc197dbc5c6997d910",
+    "exit_code": 0,
+    "stdout": "CREATE INDEX\n",
+    "stderr": ""
+  }
+]

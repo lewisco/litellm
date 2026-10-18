@@ -1,0 +1,40 @@
+[
+  {
+    "method": "POST",
+    "url": "http://localhost:4000/mcp-rest/tools/call",
+    "authorization": "Generated virtual key",
+    "customer_id": "qa-final-denied",
+    "request": {
+      "server_id": "qa-final-open",
+      "name": "read_example",
+      "arguments": {}
+    },
+    "status": 403,
+    "response": {
+      "detail": {
+        "error": "access_denied",
+        "message": "The key is not allowed to access server qa-final-open"
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://localhost:4000/mcp-rest/tools/call",
+    "authorization": "Generated virtual key",
+    "customer_id": "qa-final-denied",
+    "request": {
+      "server_id": "qa-final-open",
+      "name": "write_example",
+      "arguments": {
+        "value": "proof"
+      }
+    },
+    "status": 403,
+    "response": {
+      "detail": {
+        "error": "access_denied",
+        "message": "The key is not allowed to access server qa-final-open"
+      }
+    }
+  }
+]

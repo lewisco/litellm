@@ -1,0 +1,60 @@
+{
+  "phase": "after-pr2",
+  "action": "single-toolset-replace",
+  "before": {
+    "user_id": "qa-final-group",
+    "alias": "qa-final-group",
+    "budget_id": "590dd4e5-a8f0-4bf8-8b10-c54dc27a51d5",
+    "allowed_model_region": null,
+    "object_permission": {
+      "object_permission_id": "5dc7f1d7-16c9-4ff8-bb55-b1e4437caa85",
+      "mcp_servers": [],
+      "mcp_access_groups": [
+        "qa-final-group-a"
+      ],
+      "mcp_tool_permissions": {},
+      "vector_stores": [],
+      "agents": [],
+      "agent_access_groups": [],
+      "models": [],
+      "mcp_toolsets": [
+        "dd508968-029a-4f96-a433-4471dec03cae"
+      ],
+      "blocked_tools": [],
+      "search_tools": [],
+      "mcp_tool_search_enabled": null,
+      "skills": []
+    }
+  },
+  "posts": [],
+  "after": {
+    "user_id": "qa-final-group",
+    "alias": "qa-final-group",
+    "budget_id": "590dd4e5-a8f0-4bf8-8b10-c54dc27a51d5",
+    "allowed_model_region": null,
+    "object_permission": {
+      "object_permission_id": "5dc7f1d7-16c9-4ff8-bb55-b1e4437caa85",
+      "mcp_servers": [],
+      "mcp_access_groups": [
+        "qa-final-group-a"
+      ],
+      "mcp_tool_permissions": {},
+      "vector_stores": [],
+      "agents": [],
+      "agent_access_groups": [],
+      "models": [],
+      "mcp_toolsets": [
+        "dd508968-029a-4f96-a433-4471dec03cae"
+      ],
+      "blocked_tools": [],
+      "search_tools": [],
+      "mcp_tool_search_enabled": null,
+      "skills": []
+    }
+  },
+  "alerts": [
+    "Environment-credential login is enabledReview",
+    ""
+  ],
+  "refresh_count": 2
+}
